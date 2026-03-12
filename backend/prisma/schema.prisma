@@ -14,3 +14,36 @@ model User {
   name String
   createdAt DateTime @default(now())
 }
+
+model Person {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  birthDate DateTime?
+  deathDate DateTime?
+  bio String
+  createdAt DateTime @default(now())
+
+  relationshipsA Relationship[] @relation("A")
+  relationshipsB Relationship[] @relation("B")
+}
+
+model Relationship {
+  id String @id @default(uuid())
+
+  personA Person @relation("A", fields: [personAId], references: [id])
+  personAId String
+
+  personB Person @relation("B", fields: [personBId], references: [id])
+  personBId String
+
+  type RelationshipType
+}
+
+enum RelationshipType {
+  PARENT
+  CHILD
+  SPOUSE
+  SIBLING
+}
+

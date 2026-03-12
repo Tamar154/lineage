@@ -7,11 +7,6 @@ import { generateToken } from "../utils/generateToken.js";
 const register: RequestHandler = async (req, res) => {
   const { email, password, name } = req.body;
 
-  // Check if email and password are given
-  if (!email || !password) {
-    throw new AppError("Missing credentials", 400);
-  }
-
   // Normalize email
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -51,10 +46,6 @@ const register: RequestHandler = async (req, res) => {
 
 const login: RequestHandler = async (req, res) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    throw new AppError("Missing credentials", 400);
-  }
 
   const normalizedEmail = email.trim().toLowerCase();
 

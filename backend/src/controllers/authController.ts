@@ -50,11 +50,48 @@ const register: RequestHandler = async (req, res) => {
 };
 
 const login: RequestHandler = async (req, res) => {
-  res.json({ message: "login" });
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new AppError("Missing credentials", 400);
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // Check if credentials are valid
+  const user = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+  });
+
+  const validPassword = user
+    ? await bcrypt.compare(password, user.password)
+    : false;
+
+  if (!user || !validPassword) {
+    throw new AppError("Invalid credentials", 401);
+  }
+
+  // Generate a jwt token
+  generateToken(user, res);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    },
+  });
 };
 
 const logout: RequestHandler = async (req, res) => {
-  res.json({ message: "logout" });
+  // Clear the JWT cookie
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    sameSite: "strict",
+  });
+
+  res.json({ status: "success" });
 };
 
 export { register, login, logout };

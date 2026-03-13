@@ -16,8 +16,6 @@ const getTrees: RequestHandler = async (req, res) => {
 const createTree: RequestHandler = async (req, res) => {
   const { name } = req.body;
 
-  console.log(name);
-
   // Check if there is already a tree with the same name for this user
   const sameName = await prisma.tree.findFirst({
     where: {
@@ -38,7 +36,7 @@ const createTree: RequestHandler = async (req, res) => {
     },
   });
 
-  res.json({
+  res.status(201).json({
     status: "success",
     data: tree,
   });

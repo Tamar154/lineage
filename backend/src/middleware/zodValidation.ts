@@ -15,3 +15,15 @@ export const validate = (schema: ZodType): RequestHandler => {
     next();
   };
 };
+
+export const parseParams = (schema: ZodType): RequestHandler => {
+  return (req, res, next) => {
+    const parsed = schema.safeParse(req.params);
+
+    if (!parsed.success) {
+      throw new AppError(z.prettifyError(parsed.error), 400);
+    }
+
+    next();
+  };
+};

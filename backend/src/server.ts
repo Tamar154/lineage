@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cookieParser from "cookie-parser";
 
 // Custom errors
 import { errorHandler } from "./middleware/errorHandler.js";
@@ -7,17 +8,17 @@ import AppError from "./utils/AppError.js";
 
 // Import routes
 import authRoutes from "./routes/authRoutes.js";
+import treeRoutes from "./routes/treeRoutes.js";
 
 const app = express();
 
+// Middleware
 app.use(express.json());
-
-app.get("/health", (req, res) => {
-  res.json({ message: "Health Check" });
-});
+app.use(cookieParser());
 
 // Routes
-app.use("/auth", authRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/trees", treeRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

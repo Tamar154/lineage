@@ -12,7 +12,7 @@ const router = express.Router();
 router.use(verifyToken);
 
 router.get("/", getTrees);
-router.post("/:id", createTree);
+router.post("/", createTree);
 router.get("/:id", getTree);
 router.delete("/:id", deleteTree);
 

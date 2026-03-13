@@ -6,13 +6,15 @@ import {
   getTree,
   deleteTree,
 } from "../controllers/treeController.js";
+import { validate } from "../middleware/validate.js";
+import { createTreeSchema } from "../validators/treeValidators.js";
 
 const router = express.Router();
 
 router.use(verifyToken);
 
 router.get("/", getTrees);
-router.post("/", createTree);
+router.post("/", validate(createTreeSchema), createTree);
 router.get("/:id", getTree);
 router.delete("/:id", deleteTree);
 

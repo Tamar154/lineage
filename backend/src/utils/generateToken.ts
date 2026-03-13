@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { type Response } from "express";
 import type { User } from "../generated/prisma/client.js";
+import type { JwtPayload } from "../types/jwt.js";
 
 /**
  * Generates a JWT token for the given user and sets it as a cookie in the response.
@@ -9,10 +10,8 @@ import type { User } from "../generated/prisma/client.js";
  * @returns The generated JWT token.
  */
 export function generateToken(user: User, res: Response) {
-  const payload = {
+  const payload: JwtPayload = {
     id: user.id,
-    email: user.email,
-    name: user.name,
   };
 
   const secret = process.env.JWT_SECRET!;

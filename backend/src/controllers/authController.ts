@@ -75,7 +75,7 @@ const login: RequestHandler = async (req, res) => {
   });
 };
 
-const logout: RequestHandler = async (req, res) => {
+const logout: RequestHandler = (req, res) => {
   // Clear the JWT cookie
   res.clearCookie("jwt", {
     httpOnly: true,

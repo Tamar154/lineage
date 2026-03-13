@@ -91,10 +91,7 @@ const deleteTree: RequestHandler<TreeParams> = async (req, res) => {
     },
   });
 
-  res.json({
-    status: "success",
-    data: null,
-  });
+  res.status(204).send();
 };
 
 export { getTrees, createTree, getTree, deleteTree };

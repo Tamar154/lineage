@@ -7,3 +7,5 @@ export const createTreeSchema = z.object({
 export const treeParamsSchema = z.object({
   id: z.uuid(),
 });
+
+export type CreateTreeInput = z.infer<typeof createTreeSchema>;

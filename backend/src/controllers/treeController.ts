@@ -2,6 +2,8 @@ import type { RequestHandler } from "express";
 import { prisma } from "../config/db.js";
 import AppError from "../utils/AppError.js";
 
+import type { CreateTreeInput } from "../validators/treeValidators.js";
+
 const getTrees: RequestHandler = async (req, res) => {
   // Find all trees that belong to the authenticated user
   const trees = await prisma.tree.findMany({
@@ -14,7 +16,10 @@ const getTrees: RequestHandler = async (req, res) => {
   });
 };
 
-const createTree: RequestHandler = async (req, res) => {
+const createTree: RequestHandler<{}, {}, CreateTreeInput> = async (
+  req,
+  res,
+) => {
   const { name } = req.body;
 
   // Check if there is already a tree with the same name for this user
@@ -44,8 +49,6 @@ const createTree: RequestHandler = async (req, res) => {
 };
 
 const getTree: RequestHandler = async (req, res) => {
-  const id = req.params.id;
-
   const tree = req.tree!; // This is set by the validateOwner middleware
 
   res.json({

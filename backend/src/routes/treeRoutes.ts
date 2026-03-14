@@ -7,6 +7,7 @@ import {
   deleteTree,
 } from "../controllers/treeController.js";
 import { validate, parseParams } from "../middleware/zodValidation.js";
+import { validateOwner } from "../middleware/validateOwner.js";
 import {
   createTreeSchema,
   treeParamsSchema,
@@ -18,7 +19,7 @@ router.use(verifyToken);
 
 router.get("/", getTrees);
 router.post("/", validate(createTreeSchema), createTree);
-router.get("/:id", parseParams(treeParamsSchema), getTree);
-router.delete("/:id", parseParams(treeParamsSchema), deleteTree);
+router.get("/:id", parseParams(treeParamsSchema), validateOwner, getTree);
+router.delete("/:id", parseParams(treeParamsSchema), validateOwner, deleteTree);
 
 export default router;

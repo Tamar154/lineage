@@ -2,11 +2,8 @@ import type { RequestHandler } from "express";
 import { prisma } from "../config/db.js";
 import AppError from "../utils/AppError.js";
 
-type TreeParams = {
-  id: string;
-};
-
 const getTrees: RequestHandler = async (req, res) => {
+  // Find all trees that belong to the authenticated user
   const trees = await prisma.tree.findMany({
     where: { ownerId: req.user!.id },
   });
@@ -46,22 +43,10 @@ const createTree: RequestHandler = async (req, res) => {
   });
 };
 
-const getTree: RequestHandler<TreeParams> = async (req, res) => {
+const getTree: RequestHandler = async (req, res) => {
   const id = req.params.id;
 
-  console.log(id);
-
-  // Find the tree and ensure it belongs to the authenticated user
-  const tree = await prisma.tree.findFirst({
-    where: {
-      id,
-      ownerId: req.user!.id,
-    },
-  });
-
-  if (!tree) {
-    throw new AppError("Tree not found", 404);
-  }
+  const tree = req.tree!; // This is set by the validateOwner middleware
 
   res.json({
     status: "success",
@@ -69,25 +54,11 @@ const getTree: RequestHandler<TreeParams> = async (req, res) => {
   });
 };
 
-const deleteTree: RequestHandler<TreeParams> = async (req, res) => {
-  const id = req.params.id;
-
-  // Find the tree and ensure it belongs to the authenticated user
-  const tree = await prisma.tree.findFirst({
-    where: {
-      id,
-      ownerId: req.user!.id,
-    },
-  });
-
-  if (!tree) {
-    throw new AppError("Tree not found", 404);
-  }
-
+const deleteTree: RequestHandler = async (req, res) => {
   // Delete the tree
   await prisma.tree.delete({
     where: {
-      id,
+      id: req.tree!.id, // This is set by the validateOwner middleware
     },
   });
 

@@ -3,8 +3,12 @@ import AppError from "../utils/AppError.js";
 import { prisma } from "../config/db.js";
 import bcrypt from "bcrypt";
 import { generateToken } from "../utils/generateToken.js";
+import type {
+  LoginInput,
+  RegisterInput,
+} from "../validators/authValidators.js";
 
-const register: RequestHandler = async (req, res) => {
+const register: RequestHandler<{}, {}, RegisterInput> = async (req, res) => {
   const { email, password, name } = req.body;
 
   // Normalize email
@@ -27,7 +31,7 @@ const register: RequestHandler = async (req, res) => {
     data: {
       email: normalizedEmail,
       password: hashedPassword,
-      name: name ?? normalizedEmail.split("@")[0],
+      name: name ?? normalizedEmail.split("@")[0]!,
     },
   });
 
@@ -44,7 +48,7 @@ const register: RequestHandler = async (req, res) => {
   });
 };
 
-const login: RequestHandler = async (req, res) => {
+const login: RequestHandler<{}, {}, LoginInput> = async (req, res) => {
   const { email, password } = req.body;
 
   const normalizedEmail = email.trim().toLowerCase();

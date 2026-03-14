@@ -9,6 +9,7 @@ import AppError from "./utils/AppError.js";
 // Import routes
 import authRoutes from "./routes/authRoutes.js";
 import treeRoutes from "./routes/treeRoutes.js";
+import personRoutes from "./routes/personRoutes.js";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/trees", treeRoutes);
+app.use("/api", personRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

@@ -12,6 +12,7 @@ import AppError from "./utils/AppError.js";
 import authRoutes from "./routes/authRoutes.js";
 import treeRoutes from "./routes/treeRoutes.js";
 import personRoutes from "./routes/personRoutes.js";
+import relationshipRoutes from "./routes/relationshipRoutes.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(loggerMiddleware);
 app.use("/api/auth", authRoutes);
 app.use("/api/trees", treeRoutes);
 app.use("/api/trees/:treeId/persons", personRoutes);
+app.use("/api/trees/:treeId/relationships", relationshipRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

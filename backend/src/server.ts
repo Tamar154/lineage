@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import cookieParser from "cookie-parser";
 
+import loggerMiddleware from "./middleware/loggerMiddleware.js";
+
 // Custom errors
 import { errorHandler } from "./middleware/errorHandler.js";
 import AppError from "./utils/AppError.js";
@@ -16,11 +18,12 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
+app.use(loggerMiddleware);
 
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/trees", treeRoutes);
-app.use("/api//trees/:treeId", personRoutes);
+app.use("/api/trees/:treeId", personRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

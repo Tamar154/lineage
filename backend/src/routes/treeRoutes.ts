@@ -8,8 +8,10 @@ import {
 } from "../controllers/treeController.js";
 import { validateBody, parseParams } from "../middleware/zodValidation.js";
 import { validateOwner } from "../middleware/validateOwner.js";
-import { createTreeSchema } from "../validators/treeValidators.js";
-import { idParamsSchema } from "../validators/idParams.js";
+import {
+  createTreeSchema,
+  treeParamsSchema,
+} from "../validators/treeValidators.js";
 
 const router = express.Router();
 
@@ -17,7 +19,7 @@ router.use(verifyToken);
 
 router.get("/", getTrees);
 router.post("/", validateBody(createTreeSchema), createTree);
-router.get("/:id", parseParams(idParamsSchema), validateOwner, getTree);
-router.delete("/:id", parseParams(idParamsSchema), validateOwner, deleteTree);
+router.get("/:id", parseParams(treeParamsSchema), validateOwner, getTree);
+router.delete("/:id", parseParams(treeParamsSchema), validateOwner, deleteTree);
 
 export default router;

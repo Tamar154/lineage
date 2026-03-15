@@ -110,6 +110,7 @@ const deletePerson: RequestHandler<PersonParams> = async (req, res) => {
   await prisma.person.delete({
     where: {
       id: req.params.id,
+      treeId: req.tree!.id,
     },
   });
 

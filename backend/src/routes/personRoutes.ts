@@ -22,7 +22,12 @@ router.use(validateOwner); // All routes require ownership validation
 router.post("/persons", validateBody(createPersonSchema), createPerson);
 router.get("/persons", getPersons);
 router.get("/persons/:id", parseParams(personParamsSchema), getPersonById);
-router.put("/persons/:id", parseParams(personParamsSchema), updatePerson);
+router.put(
+  "/persons/:id",
+  parseParams(personParamsSchema),
+  validateBody(createPersonSchema),
+  updatePerson,
+);
 router.delete("/persons/:id", parseParams(personParamsSchema), deletePerson);
 
 export default router;

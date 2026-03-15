@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 import type { CreatePersonInput } from "../validators/personValidators.js";
 import { prisma } from "../config/db.js";
+import AppError from "../utils/AppError.js";
 
 type PersonParams = {
   id: string;
@@ -31,6 +32,14 @@ const getPersons: RequestHandler = async (req, res) => {
     where: {
       treeId: req.tree.id,
     },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      birthDate: true,
+      deathDate: true,
+      bio: true,
+    },
   });
 
   res.json({ status: "success", data: persons });
@@ -44,9 +53,58 @@ const getPersonById: RequestHandler<PersonParams> = async (req, res) => {
     },
   });
 
-  res.json({ status: "success", data: person });
+  if (!person) throw new AppError("Person not found", 404);
+
+  res.json({
+    status: "success",
+    data: {
+      id: person.id,
+      firstName: person.firstName,
+      lastName: person.lastName,
+      birthDate: person.birthDate,
+      deathDate: person.deathDate,
+      bio: person.bio,
+    },
+  });
 };
-const updatePerson: RequestHandler = async (req, res) => {};
+
+const updatePerson: RequestHandler<PersonParams> = async (req, res) => {
+  const existingPerson = await prisma.person.findFirst({
+    where: {
+      id: req.params.id,
+      treeId: req.tree!.id,
+    },
+  });
+
+  if (!existingPerson) throw new AppError("Person not found", 404);
+
+  const { firstName, lastName, birthDate, deathDate, bio } = req.body;
+
+  const person = await prisma.person.update({
+    where: {
+      id: req.params.id,
+    },
+    data: {
+      firstName: firstName ?? existingPerson.firstName,
+      lastName: lastName ?? existingPerson.lastName,
+      birthDate: birthDate ?? existingPerson.birthDate,
+      deathDate: deathDate ?? existingPerson.deathDate,
+      bio: bio ?? existingPerson.bio,
+    },
+  });
+
+  res.json({
+    status: "success",
+    data: {
+      id: person.id,
+      firstName: person.firstName,
+      lastName: person.lastName,
+      birthDate: person.birthDate,
+      deathDate: person.deathDate,
+      bio: person.bio,
+    },
+  });
+};
 const deletePerson: RequestHandler = async (req, res) => {};
 
 export { createPerson, getPersons, getPersonById, updatePerson, deletePerson };

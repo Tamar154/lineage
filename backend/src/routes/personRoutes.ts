@@ -19,15 +19,15 @@ const router = express.Router();
 router.use(verifyToken);
 router.use(validateOwner); // All routes require ownership validation
 
-router.post("/persons", validateBody(createPersonSchema), createPerson);
-router.get("/persons", getPersons);
-router.get("/persons/:id", parseParams(personParamsSchema), getPersonById);
+router.post("/", validateBody(createPersonSchema), createPerson);
+router.get("/", getPersons);
+router.get("/:id", parseParams(personParamsSchema), getPersonById);
 router.put(
-  "/persons/:id",
+  "/:id",
   parseParams(personParamsSchema),
   validateBody(createPersonSchema),
   updatePerson,
 );
-router.delete("/persons/:id", parseParams(personParamsSchema), deletePerson);
+router.delete("/:id", parseParams(personParamsSchema), deletePerson);
 
 export default router;

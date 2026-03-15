@@ -23,7 +23,7 @@ app.use(loggerMiddleware);
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/trees", treeRoutes);
-app.use("/api/trees/:treeId", personRoutes);
+app.use("/api/trees/:treeId/persons", personRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

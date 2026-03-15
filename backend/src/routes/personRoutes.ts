@@ -8,19 +8,21 @@ import {
 } from "../controllers/personController.js";
 import { validateOwner } from "../middleware/validateOwner.js";
 import { verifyToken } from "../middleware/verifyToken.js";
-import { parseParams } from "../middleware/zodValidation.js";
-import { idParamsSchema } from "../validators/idParams.js";
+import { parseParams, validateBody } from "../middleware/zodValidation.js";
+import {
+  createPersonSchema,
+  personParamsSchema,
+} from "../validators/personValidators.js";
 
 const router = express.Router();
 
 router.use(verifyToken);
 router.use(validateOwner); // All routes require ownership validation
-router.use(parseParams(idParamsSchema));
 
-router.post("/persons", createPerson);
+router.post("/persons", validateBody(createPersonSchema), createPerson);
 router.get("/persons", getPersons);
-router.get("/persons/:id", getPersonById);
-router.put("/persons/:id", updatePerson);
-router.delete("/persons/:id", deletePerson);
+router.get("/persons/:id", parseParams(personParamsSchema), getPersonById);
+router.put("/persons/:id", parseParams(personParamsSchema), updatePerson);
+router.delete("/persons/:id", parseParams(personParamsSchema), deletePerson);
 
 export default router;

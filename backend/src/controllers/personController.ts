@@ -105,6 +105,15 @@ const updatePerson: RequestHandler<PersonParams> = async (req, res) => {
     },
   });
 };
-const deletePerson: RequestHandler = async (req, res) => {};
+
+const deletePerson: RequestHandler<PersonParams> = async (req, res) => {
+  await prisma.person.delete({
+    where: {
+      id: req.params.id,
+    },
+  });
+
+  res.status(204).send();
+};
 
 export { createPerson, getPersons, getPersonById, updatePerson, deletePerson };

@@ -20,7 +20,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/trees", treeRoutes);
-app.use("/api", personRoutes);
+app.use("/api//trees/:treeId", personRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

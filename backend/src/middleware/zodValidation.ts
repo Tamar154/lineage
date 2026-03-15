@@ -8,7 +8,7 @@ import AppError from "../utils/AppError.js";
  * @param schema - The Zod schema to validate against
  * @return A middleware function that validates the request body
  */
-export const validate = (schema: ZodType): RequestHandler => {
+export const validateBody = (schema: ZodType): RequestHandler => {
   return (req, res, next) => {
     const parsed = schema.safeParse(req.body);
 

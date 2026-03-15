@@ -3,18 +3,19 @@ import { prisma } from "../config/db.js";
 import AppError from "../utils/AppError.js";
 
 type TreeParams = {
-  id: string;
+  treeId: string;
 };
 
 /**
  * Middleware to validate that the tree being accessed belongs to the authenticated user.
+ * Upon success, it attaches the tree to the request object for later use.
  */
 export const validateOwner: RequestHandler<TreeParams> = async (
   req,
   res,
   next,
 ) => {
-  const treeId = req.params.id;
+  const treeId = req.params.treeId;
 
   const tree = await prisma.tree.findFirst({
     where: {

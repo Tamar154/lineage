@@ -19,7 +19,12 @@ router.use(verifyToken);
 
 router.get("/", getTrees);
 router.post("/", validateBody(createTreeSchema), createTree);
-router.get("/:id", parseParams(treeParamsSchema), validateOwner, getTree);
-router.delete("/:id", parseParams(treeParamsSchema), validateOwner, deleteTree);
+router.get("/:treeId", parseParams(treeParamsSchema), validateOwner, getTree);
+router.delete(
+  "/:treeId",
+  parseParams(treeParamsSchema),
+  validateOwner,
+  deleteTree,
+);
 
 export default router;

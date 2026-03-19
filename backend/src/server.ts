@@ -14,7 +14,7 @@ import treeRoutes from "./routes/treeRoutes.js";
 import personRoutes from "./routes/personRoutes.js";
 import relationshipRoutes from "./routes/relationshipRoutes.js";
 
-const app = express();
+export const app = express();
 
 // Middleware
 app.use(express.json());
@@ -34,8 +34,3 @@ app.use((req, res, next) => {
 
 // Centralized error handler
 app.use(errorHandler);
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});

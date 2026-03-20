@@ -63,7 +63,7 @@ const login: RequestHandler<{}, {}, LoginInput> = async (req, res) => {
     : false;
 
   if (!user || !validPassword) {
-    throw new AppError("Invalid credentials", 401);
+    throw new AppError("Unauthorized", 401);
   }
 
   // Generate a jwt token

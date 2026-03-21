@@ -3,14 +3,13 @@ import { prisma } from "../config/db.js";
 
 beforeAll(async () => {
   await prisma.$connect();
-});
 
-beforeEach(async () => {
-  // Clear all tables before each test
+  // Clear all tables before starting tests
   console.log("Clearing database...");
-  await prisma.$executeRawUnsafe(
-    `TRUNCATE TABLE "User", "Tree", "Person", "Relationship" RESTART IDENTITY CASCADE;`,
-  );
+  await prisma.relationship.deleteMany();
+  await prisma.person.deleteMany();
+  await prisma.tree.deleteMany();
+  await prisma.user.deleteMany();
 });
 
 afterAll(async () => {

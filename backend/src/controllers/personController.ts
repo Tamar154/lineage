@@ -24,7 +24,17 @@ const createPerson: RequestHandler<{}, {}, CreatePersonInput> = async (
     },
   });
 
-  res.status(201).json({ status: "success", data: person });
+  res.status(201).json({
+    status: "success",
+    data: {
+      id: person.id,
+      firstName: person.firstName,
+      lastName: person.lastName,
+      birthDate: person.birthDate,
+      deathDate: person.deathDate,
+      bio: person.bio,
+    },
+  });
 };
 
 const getPersons: RequestHandler = async (req, res) => {
@@ -107,6 +117,15 @@ const updatePerson: RequestHandler<PersonParams> = async (req, res) => {
 };
 
 const deletePerson: RequestHandler<PersonParams> = async (req, res) => {
+  const existingPerson = await prisma.person.findFirst({
+    where: {
+      id: req.params.id,
+      treeId: req.tree!.id,
+    },
+  });
+
+  if (!existingPerson) throw new AppError("Person not found", 404);
+
   await prisma.person.delete({
     where: {
       id: req.params.id,

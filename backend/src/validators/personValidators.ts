@@ -5,7 +5,7 @@ export const createPersonSchema = z.object({
   lastName: z.string().min(1),
   birthDate: z.coerce.date().max(new Date()).optional(),
   deathDate: z.coerce.date().max(new Date()).optional(),
-  bio: z.string(),
+  bio: z.string().optional(),
 });
 
 export const personParamsSchema = z.object({

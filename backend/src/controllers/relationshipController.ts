@@ -1,15 +1,17 @@
 import type { RequestHandler } from "express";
 import { prisma } from "../config/db.js";
 import AppError from "../utils/AppError.js";
-import type { CreateRelInput } from "../validators/relationshipValidators.js";
+import type {
+  CreateRelInput,
+  RelationshipParams,
+} from "../validators/relationshipValidators.js";
 import { RelationshipType } from "../generated/prisma/index.js";
-
 const createRelationship: RequestHandler<{}, {}, CreateRelInput> = async (
   req,
   res,
 ) => {
   const { personAId, personBId, type } = req.body;
-  const treeId = req.tree!.id;
+  const treeId = req.tree.id;
 
   // Validate that a person cannot have a relationship with themselves
   if (personAId === personBId) {
@@ -101,8 +103,33 @@ const getRelationships: RequestHandler = async (req, res) => {
   });
 };
 
-const getRelationshipById: RequestHandler = async (req, res) => {};
+const getRelationshipById: RequestHandler<RelationshipParams, {}, {}> = async (
+  req,
+  res,
+) => {
+  const { id } = req.params;
+
+  const relationship = await prisma.relationship.findFirst({
+    where: { id, treeId: req.tree.id },
+  });
+
+  if (!relationship) {
+    throw new AppError("Relationship not found", 404);
+  }
+
+  res.json({
+    status: "success",
+    data: {
+      id: relationship.id,
+      personAId: relationship.personAId,
+      personBId: relationship.personBId,
+      type: relationship.type,
+    },
+  });
+};
+
 const updateRelationship: RequestHandler = async (req, res) => {};
+
 const deleteRelationship: RequestHandler = async (req, res) => {};
 
 export {

@@ -7,4 +7,9 @@ export const createRelSchema = z.object({
   type: z.enum(RelationshipType),
 });
 
+export const relParamsSchema = z.object({
+  id: z.uuid(),
+});
+
 export type CreateRelInput = z.infer<typeof createRelSchema>;
+export type RelationshipParams = z.infer<typeof relParamsSchema>;

@@ -14,7 +14,7 @@ import {
   personParamsSchema,
 } from "../validators/personValidators.js";
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router.use(verifyToken);
 router.use(validateOwner); // All routes require ownership validation

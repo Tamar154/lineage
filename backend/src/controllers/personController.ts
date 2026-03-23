@@ -78,7 +78,11 @@ const getPersonById: RequestHandler<PersonParams> = async (req, res) => {
   });
 };
 
-const updatePerson: RequestHandler<PersonParams> = async (req, res) => {
+const updatePerson: RequestHandler<
+  PersonParams,
+  {},
+  CreatePersonInput
+> = async (req, res) => {
   const existingPerson = await prisma.person.findFirst({
     where: {
       id: req.params.id,
@@ -95,11 +99,11 @@ const updatePerson: RequestHandler<PersonParams> = async (req, res) => {
       id: req.params.id,
     },
     data: {
-      firstName: firstName ?? existingPerson.firstName,
-      lastName: lastName ?? existingPerson.lastName,
-      birthDate: birthDate ?? existingPerson.birthDate,
-      deathDate: deathDate ?? existingPerson.deathDate,
-      bio: bio ?? existingPerson.bio,
+      firstName,
+      lastName,
+      birthDate: birthDate ?? null,
+      deathDate: deathDate ?? null,
+      bio: bio ?? null,
     },
   });
 

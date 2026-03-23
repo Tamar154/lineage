@@ -2,69 +2,19 @@ import type { RequestHandler } from "express";
 import { prisma } from "../config/db.js";
 import AppError from "../utils/AppError.js";
 import type {
-  CreateRelInput,
+  RelationshipInput,
   RelationshipParams,
 } from "../validators/relationshipValidators.js";
-import { RelationshipType } from "../generated/prisma/index.js";
-const createRelationship: RequestHandler<{}, {}, CreateRelInput> = async (
+import { validateRelationship } from "../services/relationshipService.js";
+
+const createRelationship: RequestHandler<{}, {}, RelationshipInput> = async (
   req,
   res,
 ) => {
   const { personAId, personBId, type } = req.body;
   const treeId = req.tree.id;
 
-  // Validate that a person cannot have a relationship with themselves
-  if (personAId === personBId) {
-    throw new AppError("A person cannot relate to themselves", 400);
-  }
-
-  // Validate that both persons belong to the same tree
-  const persons = await prisma.person.findMany({
-    where: {
-      id: { in: [personAId, personBId] },
-      treeId,
-    },
-  });
-
-  if (persons.length !== 2) {
-    throw new AppError("Both persons must belong to the same tree", 400);
-  }
-
-  // Check if relationship already exists + prevent reversed duplicates
-  // TODO: Good for undirected relationships (sibling or spouse), potential issues with directed relationships (parent-child) => may need to consider direction in the future
-  const existing = await prisma.relationship.findFirst({
-    where: {
-      treeId,
-      type,
-      // Check for both directions if it's a SPOUSE relationship, otherwise check only the specified direction
-      OR: [
-        { personAId, personBId },
-        ...(type === RelationshipType.SPOUSE
-          ? [{ personAId: personBId, personBId: personAId }]
-          : []),
-      ],
-    },
-  });
-
-  if (existing) {
-    throw new AppError("Relationship already exists", 400);
-  }
-
-  if (type === RelationshipType.PARENT) {
-    // Prevent circular relationships (e.g. A is parent of B, B is parent of A)
-    const circular = await prisma.relationship.findFirst({
-      where: {
-        treeId,
-        type: RelationshipType.PARENT,
-        personAId: personBId,
-        personBId: personAId,
-      },
-    });
-
-    if (circular) {
-      throw new AppError("Circular relationship detected", 400);
-    }
-  }
+  await validateRelationship(personAId, personBId, type, treeId);
 
   // Create new relationship
   const relationship = await prisma.relationship.create({
@@ -128,9 +78,67 @@ const getRelationshipById: RequestHandler<RelationshipParams, {}, {}> = async (
   });
 };
 
-const updateRelationship: RequestHandler = async (req, res) => {};
+const updateRelationship: RequestHandler<
+  RelationshipParams,
+  {},
+  RelationshipInput
+> = async (req, res) => {
+  const { id } = req.params;
+  const { personAId, personBId, type } = req.body;
+  const treeId = req.tree.id;
 
-const deleteRelationship: RequestHandler = async (req, res) => {};
+  // Check if relationship exists and belongs to the tree
+  const existing = await prisma.relationship.findFirst({
+    where: { id, treeId },
+  });
+
+  if (!existing) {
+    throw new AppError("Relationship not found", 404);
+  }
+
+  await validateRelationship(personAId, personBId, type, treeId, id);
+
+  // Update relationship
+  const updated = await prisma.relationship.update({
+    where: { id },
+    data: { personAId, personBId, type },
+  });
+
+  res.json({
+    status: "success",
+    data: {
+      id: updated.id,
+      personAId: updated.personAId,
+      personBId: updated.personBId,
+      type: updated.type,
+    },
+  });
+};
+
+const deleteRelationship: RequestHandler<RelationshipParams, {}, {}> = async (
+  req,
+  res,
+) => {
+  const { id } = req.params;
+  const treeId = req.tree.id;
+
+  // Check if relationship exists and belongs to the tree
+  const existing = await prisma.relationship.findFirst({
+    where: { id, treeId },
+  });
+
+  if (!existing) {
+    throw new AppError("Relationship not found", 404);
+  }
+
+  await prisma.relationship.delete({
+    where: { id },
+  });
+
+  res.status(204).json({
+    status: "success",
+  });
+};
 
 export {
   createRelationship,

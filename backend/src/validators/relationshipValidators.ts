@@ -11,5 +11,5 @@ export const relParamsSchema = z.object({
   id: z.uuid(),
 });
 
-export type CreateRelInput = z.infer<typeof createRelSchema>;
+export type RelationshipInput = z.infer<typeof createRelSchema>;
 export type RelationshipParams = z.infer<typeof relParamsSchema>;

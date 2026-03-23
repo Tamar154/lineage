@@ -135,9 +135,7 @@ const deleteRelationship: RequestHandler<RelationshipParams, {}, {}> = async (
     where: { id },
   });
 
-  res.status(204).json({
-    status: "success",
-  });
+  res.status(204).send();
 };
 
 export {

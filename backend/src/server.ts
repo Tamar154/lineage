@@ -13,6 +13,7 @@ import authRoutes from "./routes/authRoutes.js";
 import treeRoutes from "./routes/treeRoutes.js";
 import personRoutes from "./routes/personRoutes.js";
 import relationshipRoutes from "./routes/relationshipRoutes.js";
+import graphRoutes from "./routes/graphRoutes.js";
 
 export const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/trees", treeRoutes);
 app.use("/api/trees/:treeId/persons", personRoutes);
 app.use("/api/trees/:treeId/relationships", relationshipRoutes);
+app.use("/api/trees/:treeId/graph", graphRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

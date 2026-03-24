@@ -7,10 +7,9 @@ export const getGraph: RequestHandler<{ treeId: string }, {}, {}> = async (
   res,
 ) => {
   const { treeId } = req.params;
-  const { user } = req;
 
   const tree = await prisma.tree.findFirst({
-    where: { id: treeId, ownerId: user!.id },
+    where: { id: treeId },
     include: {
       persons: {
         select: {

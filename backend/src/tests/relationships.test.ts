@@ -57,8 +57,12 @@ describe("Relationship", () => {
 
       expect(res.status).toBe(201);
       expect(res.body.status).toBe("success");
-      expect(res.body.data.personAId).toBe(personAId);
-      expect(res.body.data.personBId).toBe(personBId);
+      expect([res.body.data.personAId, res.body.data.personBId]).toContain(
+        personAId,
+      );
+      expect([res.body.data.personAId, res.body.data.personBId]).toContain(
+        personBId,
+      );
       expect(res.body.data.type).toBe("SPOUSE");
     });
 
@@ -81,8 +85,8 @@ describe("Relationship", () => {
 
       const rel = await prisma.relationship.findUnique({ where: { id } });
       expect(rel).not.toBeNull();
-      expect(rel!.personAId).toBe(personAId);
-      expect(rel!.personBId).toBe(personBId);
+      expect([rel!.personAId, rel!.personBId]).toContain(personAId);
+      expect([rel!.personAId, rel!.personBId]).toContain(personBId);
     });
 
     it("should reject a self-relationship", async () => {
@@ -348,8 +352,12 @@ describe("Relationship", () => {
       expect(res.status).toBe(200);
       expect(res.body.status).toBe("success");
       expect(res.body.data.id).toBe(relId);
-      expect(res.body.data.personAId).toBe(personAId);
-      expect(res.body.data.personBId).toBe(personBId);
+      expect([res.body.data.personAId, res.body.data.personBId]).toContain(
+        personAId,
+      );
+      expect([res.body.data.personAId, res.body.data.personBId]).toContain(
+        personBId,
+      );
       expect(res.body.data.type).toBe("SPOUSE");
     });
 
@@ -461,8 +469,12 @@ describe("Relationship", () => {
       });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.personAId).toBe(personCId);
-      expect(res.body.data.personBId).toBe(personBId);
+      expect([res.body.data.personAId, res.body.data.personBId]).toContain(
+        personCId,
+      );
+      expect([res.body.data.personAId, res.body.data.personBId]).toContain(
+        personBId,
+      );
     });
 
     it("should update personBId", async () => {
@@ -473,7 +485,12 @@ describe("Relationship", () => {
       });
 
       expect(res.status).toBe(200);
-      expect(res.body.data.personBId).toBe(personCId);
+      expect([res.body.data.personAId, res.body.data.personBId]).toContain(
+        personAId,
+      );
+      expect([res.body.data.personAId, res.body.data.personBId]).toContain(
+        personCId,
+      );
     });
 
     it("should persist the update in the database", async () => {

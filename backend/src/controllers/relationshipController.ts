@@ -6,6 +6,7 @@ import type {
   RelationshipParams,
 } from "../validators/relationshipValidators.js";
 import { validateRelationship } from "../services/relationshipService.js";
+import { normalizeRelationship } from "../services/normalizeRelationship.js";
 
 const createRelationship: RequestHandler<{}, {}, RelationshipInput> = async (
   req,
@@ -14,14 +15,22 @@ const createRelationship: RequestHandler<{}, {}, RelationshipInput> = async (
   const { personAId, personBId, type } = req.body;
   const treeId = req.tree.id;
 
-  await validateRelationship(personAId, personBId, type, treeId);
+  // Normalize the relationship to enforce unique constraint regardless of order
+  const normalized = normalizeRelationship(personAId, personBId, type);
+
+  await validateRelationship(
+    normalized.personAId,
+    normalized.personBId,
+    type,
+    treeId,
+  );
 
   // Create new relationship
   const relationship = await prisma.relationship.create({
     data: {
       treeId,
-      personAId,
-      personBId,
+      personAId: normalized.personAId,
+      personBId: normalized.personBId,
       type,
     },
   });
@@ -96,12 +105,24 @@ const updateRelationship: RequestHandler<
     throw new AppError("Relationship not found", 404);
   }
 
-  await validateRelationship(personAId, personBId, type, treeId, id);
+  const normalized = normalizeRelationship(personAId, personBId, type);
+
+  await validateRelationship(
+    normalized.personAId,
+    normalized.personBId,
+    type,
+    treeId,
+    id,
+  );
 
   // Update relationship
   const updated = await prisma.relationship.update({
     where: { id },
-    data: { personAId, personBId, type },
+    data: {
+      personAId: normalized.personAId,
+      personBId: normalized.personBId,
+      type,
+    },
   });
 
   res.json({

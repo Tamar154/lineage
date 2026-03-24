@@ -44,20 +44,13 @@ export async function validateRelationship(
     throw new AppError("Both persons must belong to the same tree", 400);
   }
 
-  // TODO: Currently we check that in code level. Consider adding unique constraint in DB for better robustness.
-  // Consider uniqueness on {treeId, personAId, personBId, type}
-  // + normalizaion ==> ensure always personAId < personBId
   const existing = await prisma.relationship.findFirst({
     where: {
       treeId,
       type,
+      personAId,
+      personBId,
       ...(currentRelId && { NOT: { id: currentRelId } }),
-      OR: [
-        { personAId, personBId },
-        ...(type === RelationshipType.SPOUSE
-          ? [{ personAId: personBId, personBId: personAId }]
-          : []),
-      ],
     },
   });
 

@@ -254,6 +254,29 @@ describe("Relationship", () => {
       expect(res.status).toBe(404);
       expect(res.body.message).toMatch(/not found|permission/i);
     });
+
+    it("should not allow creating circular relationships through multiple steps", async () => {
+      // A -> B -> C -> A would be circular. Create A->B and B->C, then try to create C->A.
+      await createRelationship({
+        personAId,
+        personBId,
+        type: "PARENT",
+      });
+      await createRelationship({
+        personAId: personBId,
+        personBId: personCId,
+        type: "PARENT",
+      });
+
+      const res = await createRelationship({
+        personAId: personCId,
+        personBId: personAId,
+        type: "PARENT",
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/circular/i);
+    });
   });
 
   describe("GET /api/trees/:treeId/relationships", () => {

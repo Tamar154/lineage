@@ -59,7 +59,7 @@ const getPersonById: RequestHandler<PersonParams> = async (req, res) => {
   const person = await prisma.person.findFirst({
     where: {
       id: req.params.id,
-      treeId: req.tree!.id,
+      treeId: req.tree.id,
     },
   });
 
@@ -86,7 +86,7 @@ const updatePerson: RequestHandler<
   const existingPerson = await prisma.person.findFirst({
     where: {
       id: req.params.id,
-      treeId: req.tree!.id,
+      treeId: req.tree.id,
     },
   });
 
@@ -124,7 +124,7 @@ const deletePerson: RequestHandler<PersonParams> = async (req, res) => {
   const existingPerson = await prisma.person.findFirst({
     where: {
       id: req.params.id,
-      treeId: req.tree!.id,
+      treeId: req.tree.id,
     },
   });
 
@@ -133,7 +133,7 @@ const deletePerson: RequestHandler<PersonParams> = async (req, res) => {
   await prisma.person.delete({
     where: {
       id: req.params.id,
-      treeId: req.tree!.id,
+      treeId: req.tree.id,
     },
   });
 

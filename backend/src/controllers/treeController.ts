@@ -7,7 +7,7 @@ import type { CreateTreeInput } from "../validators/treeValidators.js";
 const getTrees: RequestHandler = async (req, res) => {
   // Find all trees that belong to the authenticated user
   const trees = await prisma.tree.findMany({
-    where: { ownerId: req.user!.id },
+    where: { ownerId: req.user.id },
   });
 
   res.json({
@@ -26,7 +26,7 @@ const createTree: RequestHandler<{}, {}, CreateTreeInput> = async (
   const sameName = await prisma.tree.findFirst({
     where: {
       name,
-      ownerId: req.user!.id,
+      ownerId: req.user.id,
     },
   });
 
@@ -38,7 +38,7 @@ const createTree: RequestHandler<{}, {}, CreateTreeInput> = async (
   const tree = await prisma.tree.create({
     data: {
       name,
-      ownerId: req.user!.id,
+      ownerId: req.user.id,
     },
   });
 
@@ -49,7 +49,7 @@ const createTree: RequestHandler<{}, {}, CreateTreeInput> = async (
 };
 
 const getTree: RequestHandler = async (req, res) => {
-  const tree = req.tree!; // This is set by the validateOwner middleware
+  const tree = req.tree; // This is set by the validateOwner middleware
 
   res.json({
     status: "success",
@@ -61,7 +61,7 @@ const deleteTree: RequestHandler = async (req, res) => {
   // Delete the tree
   await prisma.tree.delete({
     where: {
-      id: req.tree!.id, // This is set by the validateOwner middleware
+      id: req.tree.id, // This is set by the validateOwner middleware
     },
   });
 

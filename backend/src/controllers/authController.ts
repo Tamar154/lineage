@@ -7,8 +7,13 @@ import type {
   LoginInput,
   RegisterInput,
 } from "../validators/authValidators.js";
+import type { AuthResponse } from "../types/auth.js";
 
-const register: RequestHandler<{}, {}, RegisterInput> = async (req, res) => {
+const register: RequestHandler<
+  Record<string, never>,
+  AuthResponse,
+  RegisterInput
+> = async (req, res) => {
   const { email, password, name } = req.body;
 
   // Normalize email
@@ -48,7 +53,11 @@ const register: RequestHandler<{}, {}, RegisterInput> = async (req, res) => {
   });
 };
 
-const login: RequestHandler<{}, {}, LoginInput> = async (req, res) => {
+const login: RequestHandler<
+  Record<string, never>,
+  AuthResponse,
+  LoginInput
+> = async (req, res) => {
   const { email, password } = req.body;
 
   const normalizedEmail = email.trim().toLowerCase();

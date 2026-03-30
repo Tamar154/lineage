@@ -7,11 +7,13 @@ import type {
 } from "../validators/relationshipValidators.js";
 import { validateRelationship } from "../services/relationshipService.js";
 import { normalizeRelationship } from "../services/normalizeRelationship.js";
+import type { RelationshipResponse } from "../types/relationship.js";
 
-const createRelationship: RequestHandler<{}, {}, RelationshipInput> = async (
-  req,
-  res,
-) => {
+const createRelationship: RequestHandler<
+  Record<string, never>,
+  RelationshipResponse,
+  RelationshipInput
+> = async (req, res) => {
   const { personAId, personBId, type } = req.body;
   const treeId = req.tree.id;
 
@@ -62,10 +64,11 @@ const getRelationships: RequestHandler = async (req, res) => {
   });
 };
 
-const getRelationshipById: RequestHandler<RelationshipParams, {}, {}> = async (
-  req,
-  res,
-) => {
+const getRelationshipById: RequestHandler<
+  RelationshipParams,
+  RelationshipResponse,
+  Record<string, never>
+> = async (req, res) => {
   const { id } = req.params;
 
   const relationship = await prisma.relationship.findFirst({
@@ -89,7 +92,7 @@ const getRelationshipById: RequestHandler<RelationshipParams, {}, {}> = async (
 
 const updateRelationship: RequestHandler<
   RelationshipParams,
-  {},
+  RelationshipResponse,
   RelationshipInput
 > = async (req, res) => {
   const { id } = req.params;
@@ -136,7 +139,7 @@ const updateRelationship: RequestHandler<
   });
 };
 
-const deleteRelationship: RequestHandler<RelationshipParams, {}, {}> = async (
+const deleteRelationship: RequestHandler<RelationshipParams> = async (
   req,
   res,
 ) => {

@@ -2,15 +2,17 @@ import type { RequestHandler } from "express";
 import type { CreatePersonInput } from "../validators/personValidators.js";
 import { prisma } from "../config/db.js";
 import AppError from "../utils/AppError.js";
+import type { PersonResponse } from "../types/person.js";
 
 type PersonParams = {
   id: string;
 };
 
-const createPerson: RequestHandler<{}, {}, CreatePersonInput> = async (
-  req,
-  res,
-) => {
+const createPerson: RequestHandler<
+  Record<string, never>,
+  PersonResponse,
+  CreatePersonInput
+> = async (req, res) => {
   const { firstName, lastName, birthDate, deathDate, bio } = req.body;
 
   const person = await prisma.person.create({
@@ -80,7 +82,7 @@ const getPersonById: RequestHandler<PersonParams> = async (req, res) => {
 
 const updatePerson: RequestHandler<
   PersonParams,
-  {},
+  PersonResponse,
   CreatePersonInput
 > = async (req, res) => {
   const existingPerson = await prisma.person.findFirst({

@@ -24,3 +24,7 @@
   border: 1px solid;
   border-radius: 7px;
 }
+
+.errorMsg {
+  color: #ff0000ab;
+}

@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { register } from "../services/authService";
+import { login } from "../services/authService";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/RegisterPage.module.css";
+import styles from "../styles/LoginPage.module.css";
 
-const RegisterPage = () => {
-  const [name, setName] = useState("");
+const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -15,7 +14,7 @@ const RegisterPage = () => {
     setError("");
 
     try {
-      await register({ name, email, password });
+      await login({ email, password });
       navigate("/trees");
     } catch (error: any) {
       setError(error.response.data.message || "Something went wrong");
@@ -24,24 +23,13 @@ const RegisterPage = () => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h2>Register</h2>
-      <label htmlFor="name">Name</label>
-      <input
-        className={styles.inputField}
-        type="text"
-        id="name"
-        value={name}
-        placeholder="Name"
-        onChange={(e) => setName(e.target.value)}
-      />
-
+      <h2>Login</h2>
       <label htmlFor="email">Email</label>
       <input
         className={styles.inputField}
         type="email"
         id="email"
         value={email}
-        placeholder="Email"
         autoComplete="email"
         onChange={(e) => setEmail(e.target.value)}
       />
@@ -52,18 +40,17 @@ const RegisterPage = () => {
         type="password"
         id="password"
         value={password}
-        placeholder="Password"
-        autoComplete="password"
+        autoComplete="current-password"
         onChange={(e) => setPassword(e.target.value)}
       />
 
       {error && <p className={styles.errorMsg}>{error}</p>}
 
       <button className={styles.submitBtn} type="submit">
-        Register
+        Login
       </button>
     </form>
   );
 };
 
-export default RegisterPage;
+export default LoginPage;

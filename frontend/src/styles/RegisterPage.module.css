@@ -1,0 +1,30 @@
+.form {
+  width: 35%;
+  display: flex;
+  flex-direction: column;
+  margin: 5rem auto;
+  gap: 1rem;
+  padding: 2rem;
+  border: 1px solid;
+  border-radius: 7px;
+}
+
+.inputField {
+  padding: 0.4rem;
+  margin: auto 10px 10px 10px;
+  border: 1px solid;
+  border-radius: 7px;
+}
+
+.submitBtn {
+  margin-top: 20px;
+  width: 100px;
+  padding: 10px;
+  align-self: center;
+  border: 1px solid;
+  border-radius: 7px;
+}
+
+.errorMsg {
+  color: #ff0000ab;
+}

@@ -55,7 +55,7 @@ const RegisterPage = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      {error && <p>{error}</p>}
+      {error && <p className={styles.errorMsg}>{error}</p>}
 
       <button className={styles.submitBtn} type="submit">
         Register

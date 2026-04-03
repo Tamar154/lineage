@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { register } from "../services/authService";
-import styles from "../styles/RegisterForm.module.css";
+import { useNavigate } from "react-router-dom";
+import styles from "../styles/RegisterPage.module.css";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -14,7 +16,7 @@ const RegisterPage = () => {
 
     try {
       await register({ name, email, password });
-      alert("Successfully registered");
+      navigate("/trees");
     } catch (error: any) {
       setError(error.response.data.message || "Something went wrong");
     }

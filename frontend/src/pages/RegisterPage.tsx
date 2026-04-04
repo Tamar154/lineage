@@ -32,6 +32,7 @@ const RegisterPage = () => {
         id="name"
         value={name}
         placeholder="Name"
+        required={true}
         onChange={(e) => setName(e.target.value)}
       />
 
@@ -43,6 +44,7 @@ const RegisterPage = () => {
         value={email}
         placeholder="Email"
         autoComplete="email"
+        required={true}
         onChange={(e) => setEmail(e.target.value)}
       />
 
@@ -54,6 +56,7 @@ const RegisterPage = () => {
         value={password}
         placeholder="Password"
         autoComplete="password"
+        required={true}
         onChange={(e) => setPassword(e.target.value)}
       />
 
@@ -61,6 +64,15 @@ const RegisterPage = () => {
 
       <button className={styles.submitBtn} type="submit">
         Register
+      </button>
+
+      <p>Already have an accout? </p>
+      <button
+        className={styles.loginBtn}
+        type="button"
+        onClick={() => navigate("/login")}
+      >
+        Login
       </button>
     </form>
   );

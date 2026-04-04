@@ -16,13 +16,18 @@
   border-radius: 7px;
 }
 
-.submitBtn {
-  margin-top: 20px;
+.submitBtn,
+.loginBtn {
   width: 100px;
   padding: 10px;
   align-self: center;
   border: 1px solid;
   border-radius: 7px;
+}
+
+.submitBtn {
+  margin-top: 20px;
+  margin-bottom: 30px;
 }
 
 .errorMsg {

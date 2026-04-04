@@ -31,6 +31,7 @@ const LoginPage = () => {
         id="email"
         value={email}
         autoComplete="email"
+        required={true}
         onChange={(e) => setEmail(e.target.value)}
       />
 
@@ -41,6 +42,7 @@ const LoginPage = () => {
         id="password"
         value={password}
         autoComplete="current-password"
+        required={true}
         onChange={(e) => setPassword(e.target.value)}
       />
 
@@ -48,6 +50,15 @@ const LoginPage = () => {
 
       <button className={styles.submitBtn} type="submit">
         Login
+      </button>
+
+      <p>Don't have an accout? </p>
+      <button
+        className={styles.registerBtn}
+        type="button"
+        onClick={() => navigate("/register")}
+      >
+        Register
       </button>
     </form>
   );

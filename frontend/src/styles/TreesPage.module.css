@@ -1,0 +1,22 @@
+.wrapper {
+  padding: 10px;
+}
+
+.createTreeBtn {
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+.treesWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.treeItem {
+  border: solid;
+  padding: 10px;
+  width: 200px;
+  height: 100px;
+  border-radius: 10px;
+}

@@ -1,0 +1,14 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info {
+}
+
+.people {
+}
+
+.rels {
+}

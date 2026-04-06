@@ -48,7 +48,11 @@ const TreesPage = () => {
 
       <div className={styles.treesWrapper}>
         {trees.map((tree) => (
-          <div className={styles.treeItem} key={tree.id}>
+          <div
+            className={styles.treeItem}
+            key={tree.id}
+            onClick={() => navigate(`/trees/${tree.id}`)}
+          >
             {tree.name}
           </div>
         ))}

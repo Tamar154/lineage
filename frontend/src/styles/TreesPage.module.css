@@ -5,6 +5,7 @@
 .createTreeBtn {
   margin-bottom: 20px;
   padding: 10px;
+  cursor: pointer;
 }
 
 .treesWrapper {
@@ -19,4 +20,5 @@
   width: 200px;
   height: 100px;
   border-radius: 10px;
+  cursor: pointer;
 }

@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
-import { useNavigate } from "react-router-dom";
-import styles from "../styles/LoginPage.module.css";
+import AuthLayout from "../components/AuthLayout";
+import styles from "../styles/LoginRegister.module.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -22,45 +23,44 @@ const LoginPage = () => {
   };
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <label htmlFor="email">Email</label>
-      <input
-        className={styles.inputField}
-        type="email"
-        id="email"
-        value={email}
-        autoComplete="email"
-        required={true}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+    <AuthLayout>
+      <form className={styles.form} onSubmit={handleSubmit}>
+        <h2>Welcome back</h2>
+        <label htmlFor="email">Email</label>
+        <input
+          className={styles.inputField}
+          type="email"
+          id="email"
+          value={email}
+          autoComplete="email"
+          placeholder="you@example.com"
+          required={true}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-      <label htmlFor="password">Password</label>
-      <input
-        className={styles.inputField}
-        type="password"
-        id="password"
-        value={password}
-        autoComplete="current-password"
-        required={true}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <label htmlFor="password">Password</label>
+        <input
+          className={styles.inputField}
+          type="password"
+          id="password"
+          value={password}
+          autoComplete="current-password"
+          placeholder="At least 6 characters"
+          required={true}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-      {error && <p className={styles.errorMsg}>{error}</p>}
+        {error && <p className={styles.errorMsg}>{error}</p>}
 
-      <button className={styles.submitBtn} type="submit">
-        Login
-      </button>
+        <button className={styles.submitBtn} type="submit">
+          Sign in
+        </button>
 
-      <p>Don't have an accout? </p>
-      <button
-        className={styles.registerBtn}
-        type="button"
-        onClick={() => navigate("/register")}
-      >
-        Register
-      </button>
-    </form>
+        <p>
+          Don't have an account? <Link to="/register">Create one</Link>
+        </p>
+      </form>
+    </AuthLayout>
   );
 };
 

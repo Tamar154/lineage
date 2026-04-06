@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getTrees } from "../services/treeService";
+import { getTrees, type Tree } from "../services/treeService";
 import CreateTreeForm from "../components/CreateTreeForm";
 import styles from "../styles/TreesPage.module.css";
-
-type Tree = {
-  id: number;
-  name: string;
-};
 
 const TreesPage = () => {
   const [trees, setTrees] = useState<Tree[]>([]);

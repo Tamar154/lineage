@@ -1,11 +1,11 @@
-import { LuTrees } from "react-icons/lu";
 import styles from "../styles/AuthLayout.module.css";
+import AppLogo from "./AppLogo";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
       <div className={styles.header}>
-        <LuTrees className={styles.icon} />
+        <AppLogo variant="lg" />
         <h1>LineAge</h1>
         <p>Build and explore your family lineage</p>
       </div>

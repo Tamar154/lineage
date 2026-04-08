@@ -38,3 +38,8 @@ export const getTreeById = async (
   const response = await api.get(`/trees/${data.treeId}`);
   return response.data;
 };
+
+export const deleteTree = async (data: GetTreeByIdData) => {
+  const response = await api.delete(`/trees/${data.treeId}`);
+  return response.data;
+};

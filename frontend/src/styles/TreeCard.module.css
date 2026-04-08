@@ -1,0 +1,100 @@
+.card {
+  width: 260px;
+  padding: 18px;
+  border-radius: 18px;
+  background-color: white;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+/*  HEADER  */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconWrapper {
+  background-color: #dcfce7;
+  padding: 8px;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.treeIcon {
+  font-size: 20px;
+  color: #16a34a;
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/*  META  */
+
+.meta {
+  display: flex;
+  gap: 14px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 13px;
+  color: #475569;
+}
+
+/*  FOOTER  */
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 10px;
+  border: none;
+
+  background-color: #fee2e2;
+  color: #dc2626;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.deleteBtn:hover {
+  background-color: #fecaca;
+  transform: translateY(-1px);
+}

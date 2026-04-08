@@ -1,14 +1,18 @@
 .wrapper {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  min-height: 100vh;
 }
 
-.info {
+.sidebar {
+  width: 280px;
+  border-right: 1px solid #ddd;
 }
 
-.people {
+.main {
+  flex: 1;
 }
 
-.rels {
+.details {
+  width: 320px;
+  border-left: 1px solid #ddd;
 }

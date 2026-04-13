@@ -12,8 +12,6 @@ const TreePage = () => {
   const [tree, setTree] = useState<Tree | null>(null);
   const [persons, setPersons] = useState<Person[]>([]);
 
-  const [viewMode, setViewMode] = useState<"list" | "graph">("graph");
-
   useEffect(() => {
     if (!treeId) return;
 
@@ -30,7 +28,9 @@ const TreePage = () => {
       try {
         const res = await getAllPersons({ treeId });
         setPersons(res.data);
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     fetchTree();
@@ -44,15 +44,10 @@ const TreePage = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.sidebar}>
-        <TreeSidebar
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          treeName={tree.name}
-          persons={persons}
-        />
+        <TreeSidebar treeName={tree.name} persons={persons} />
       </div>
       <div className={styles.main}>
-        <TreeMainView treeId={treeId!} />
+        <TreeMainView />
       </div>
       <div className={styles.details}>
         <PersonDetailsPanel />

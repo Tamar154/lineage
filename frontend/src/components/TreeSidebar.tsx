@@ -5,13 +5,11 @@ import styles from "../styles/TreeSidebar.module.css";
 import type { Person } from "../services/personService";
 
 type Props = {
-  viewMode: "list" | "graph";
-  setViewMode: React.Dispatch<React.SetStateAction<"list" | "graph">>;
   treeName: string;
   persons: Person[];
 };
 
-const TreeSidebar = ({ viewMode, setViewMode, treeName, persons }: Props) => {
+const TreeSidebar = ({ treeName, persons }: Props) => {
   return (
     <div className={styles.wrapper}>
       {/* <div className={styles.topSection}> */}
@@ -24,21 +22,6 @@ const TreeSidebar = ({ viewMode, setViewMode, treeName, persons }: Props) => {
       <div className={styles.header}>
         <AppLogo variant="sm" />
         <span>{treeName}</span>
-      </div>
-
-      <div className={styles.viewToggle}>
-        <button
-          className={`${styles.toggleButton} ${viewMode === "list" ? styles.active : ""}`}
-          onClick={() => setViewMode("list")}
-        >
-          List
-        </button>
-        <button
-          className={`${styles.toggleButton} ${viewMode === "graph" ? styles.active : ""}`}
-          onClick={() => setViewMode("graph")}
-        >
-          Graph
-        </button>
       </div>
 
       <div className={styles.searchSection}>

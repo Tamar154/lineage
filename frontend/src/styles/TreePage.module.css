@@ -1,6 +1,6 @@
 .wrapper {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 .sidebar {
@@ -10,6 +10,7 @@
 
 .main {
   flex: 1;
+  min-width: 0;
 }
 
 .details {

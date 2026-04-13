@@ -11,6 +11,7 @@ const TreePage = () => {
   const { treeId } = useParams();
   const [tree, setTree] = useState<Tree | null>(null);
   const [persons, setPersons] = useState<Person[]>([]);
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
 
   useEffect(() => {
     if (!treeId) return;
@@ -47,11 +48,13 @@ const TreePage = () => {
         <TreeSidebar treeName={tree.name} persons={persons} />
       </div>
       <div className={styles.main}>
-        <TreeMainView />
+        <TreeMainView persons={persons} onSelectPerson={setSelectedPerson} />
       </div>
-      <div className={styles.details}>
-        <PersonDetailsPanel />
-      </div>
+      {selectedPerson && (
+        <div className={styles.details}>
+          <PersonDetailsPanel />
+        </div>
+      )}
     </div>
   );
 };

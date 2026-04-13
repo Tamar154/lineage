@@ -6,9 +6,10 @@ import styles from "../styles/TreeSidebar.module.css";
 type Props = {
   viewMode: "list" | "graph";
   setViewMode: React.Dispatch<React.SetStateAction<"list" | "graph">>;
+  treeName: string;
 };
 
-const TreeSidebar = ({ viewMode, setViewMode }: Props) => {
+const TreeSidebar = ({ viewMode, setViewMode, treeName }: Props) => {
   return (
     <div className={styles.wrapper}>
       {/* <div className={styles.topSection}> */}
@@ -20,7 +21,7 @@ const TreeSidebar = ({ viewMode, setViewMode }: Props) => {
 
       <div className={styles.header}>
         <AppLogo variant="sm" />
-        <span>TreeName - TBI</span>
+        <span>{treeName}</span>
       </div>
 
       <div className={styles.viewToggle}>

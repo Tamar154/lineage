@@ -5,10 +5,12 @@ import PersonDetailsPanel from "../components/PersonDetailsPanel";
 import TreeMainView from "../components/TreeMainView";
 import TreeSidebar from "../components/TreeSidebar";
 import styles from "../styles/TreePage.module.css";
+import { getAllPersons, type Person } from "../services/personService";
 
 const TreePage = () => {
   const { treeId } = useParams();
   const [tree, setTree] = useState<Tree | null>(null);
+  const [persons, setPersons] = useState<Person[]>([]);
 
   const [viewMode, setViewMode] = useState<"list" | "graph">("graph");
 
@@ -24,7 +26,15 @@ const TreePage = () => {
       }
     };
 
+    const fetchPersons = async () => {
+      try {
+        const res = await getAllPersons({ treeId });
+        setPersons(res.data);
+      } catch (error) {}
+    };
+
     fetchTree();
+    fetchPersons();
   }, [treeId]);
 
   if (!tree) {
@@ -38,10 +48,11 @@ const TreePage = () => {
           viewMode={viewMode}
           setViewMode={setViewMode}
           treeName={tree.name}
+          persons={persons}
         />
       </div>
       <div className={styles.main}>
-        <TreeMainView />
+        <TreeMainView treeId={treeId!} />
       </div>
       <div className={styles.details}>
         <PersonDetailsPanel />

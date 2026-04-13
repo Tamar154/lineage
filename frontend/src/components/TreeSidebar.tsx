@@ -2,14 +2,16 @@ import AppLogo from "./AppLogo";
 import { IoIosArrowBack } from "react-icons/io";
 
 import styles from "../styles/TreeSidebar.module.css";
+import type { Person } from "../services/personService";
 
 type Props = {
   viewMode: "list" | "graph";
   setViewMode: React.Dispatch<React.SetStateAction<"list" | "graph">>;
   treeName: string;
+  persons: Person[];
 };
 
-const TreeSidebar = ({ viewMode, setViewMode, treeName }: Props) => {
+const TreeSidebar = ({ viewMode, setViewMode, treeName, persons }: Props) => {
   return (
     <div className={styles.wrapper}>
       {/* <div className={styles.topSection}> */}
@@ -48,10 +50,11 @@ const TreeSidebar = ({ viewMode, setViewMode, treeName }: Props) => {
       </div>
 
       <div className={styles.personList}>
-        <div className={styles.personItem}>Temp Temp</div>
-        <div className={styles.personItem}>Temp Temp</div>
-        <div className={styles.personItem}>Temp Temp</div>
-        <div className={styles.personItem}>Temp Temp</div>
+        {persons.map((person) => (
+          <div className={styles.personItem} key={person.id}>
+            {person.firstName} {person.lastName}
+          </div>
+        ))}
       </div>
     </div>
   );

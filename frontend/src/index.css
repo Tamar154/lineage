@@ -1,3 +1,5 @@
+@import "@xyflow/react/dist/style.css";
+
 * {
   padding: 0;
   box-sizing: border-box;

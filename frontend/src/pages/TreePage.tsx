@@ -52,7 +52,10 @@ const TreePage = () => {
       </div>
       {selectedPerson && (
         <div className={styles.details}>
-          <PersonDetailsPanel />
+          <PersonDetailsPanel
+            person={selectedPerson}
+            onClosePanel={() => setSelectedPerson(null)}
+          />
         </div>
       )}
     </div>

@@ -5,9 +5,15 @@ type Props = {
   person: Person;
   onClosePanel: () => void;
   onEditPerson: () => void;
+  onRemovePerson: () => void;
 };
 
-const PersonDetailsPanel = ({ person, onClosePanel, onEditPerson }: Props) => {
+const PersonDetailsPanel = ({
+  person,
+  onClosePanel,
+  onEditPerson,
+  onRemovePerson,
+}: Props) => {
   const formatDate = (date?: string) => {
     if (!date) return "Unknown";
 
@@ -47,7 +53,9 @@ const PersonDetailsPanel = ({ person, onClosePanel, onEditPerson }: Props) => {
         </button>
         <button className={styles.secondaryBtn}>Add Relationship</button>
         <button className={styles.primaryBtn}>View Full Profile</button>
-        <button className={styles.dangerBtn}>Remove Person</button>
+        <button className={styles.dangerBtn} onClick={onRemovePerson}>
+          Remove Person
+        </button>
       </div>
     </div>
   );

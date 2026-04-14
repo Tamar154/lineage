@@ -7,6 +7,7 @@ import TreeSidebar from "../components/TreeSidebar";
 import styles from "../styles/TreePage.module.css";
 import {
   createPerson,
+  deletePerson,
   getAllPersons,
   updatePerson,
   type Person,
@@ -83,6 +84,28 @@ const TreePage = () => {
     }
   };
 
+  const handleRemovePerson = async () => {
+    if (!treeId || !selectedPerson) return;
+
+    const isConfirmed = window.confirm(
+      `Are you sure you want to remove ${selectedPerson.firstName} ${selectedPerson.lastName}?`,
+    );
+
+    if (!isConfirmed) return;
+
+    try {
+      await deletePerson({ treeId, personId: selectedPerson.id });
+      const newPersons = persons.filter(
+        (person) => person.id !== selectedPerson.id,
+      );
+
+      setPersons(newPersons);
+      setSelectedPerson(null);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.sidebar}>
@@ -124,6 +147,7 @@ const TreePage = () => {
             person={selectedPerson}
             onClosePanel={() => setSelectedPerson(null)}
             onEditPerson={() => setShowEditPersonModal(true)}
+            onRemovePerson={handleRemovePerson}
           />
         </div>
       )}

@@ -4,11 +4,7 @@
   height: 100%;
   padding: 10px;
   gap: 15px;
-  /* border: solid; */
   background-color: white;
-}
-
-.topSection {
 }
 
 .backBtn {
@@ -35,27 +31,6 @@
   box-shadow: 0 6px 6px -6px rgba(0, 0, 0, 0.4);
 }
 
-.viewToggle {
-  display: flex;
-  background-color: #f1f1f1;
-  border-radius: 10px;
-  padding: 4px;
-}
-
-.toggleButton {
-  flex: 1;
-  border: none;
-  background: transparent;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.active {
-  background-color: white;
-  font-weight: 600;
-}
-
 .searchSection {
   width: 100%;
 }
@@ -72,6 +47,9 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+
+  flex: 1;
+  overflow-y: auto;
 }
 
 .personItem {

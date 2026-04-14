@@ -6,14 +6,20 @@ import {
   type NodeMouseHandler,
 } from "@xyflow/react";
 import type { Person } from "../services/personService";
+import { FaPlus } from "react-icons/fa6";
 import styles from "../styles/TreeMainView.module.css";
 
 type Props = {
   persons: Person[];
   onSelectPerson: (person: Person) => void;
+  onOpenCreatePerson: () => void;
 };
 
-const TreeMainView = ({ persons, onSelectPerson }: Props) => {
+const TreeMainView = ({
+  persons,
+  onSelectPerson,
+  onOpenCreatePerson,
+}: Props) => {
   const nodes: Node[] = persons.map((person, index) => ({
     id: person.id,
     type: "person",
@@ -54,6 +60,11 @@ const TreeMainView = ({ persons, onSelectPerson }: Props) => {
 
   return (
     <div className={styles.wrapper}>
+      <button className={styles.addPersonBtn} onClick={onOpenCreatePerson}>
+        <FaPlus />
+        <span>Add Person</span>
+      </button>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}

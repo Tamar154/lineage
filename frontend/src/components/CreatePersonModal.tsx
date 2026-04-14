@@ -55,11 +55,8 @@ const CreatePersonModal = ({ onClose, onCreate }: Props) => {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.header}>
-        <h2>Add Person</h2>
-      </div>
-
       <form className={styles.form} onSubmit={handleSubmit}>
+        <h2>Add Person</h2>
         <div className={styles.formGroup}>
           <label htmlFor="firstName">First Name</label>
           <input

@@ -14,6 +14,7 @@ import {
 } from "../services/personService";
 import PersonFormModal from "../components/PersonFormModal";
 import type { PersonFormData } from "../types/PersonFormData";
+import AddRelationshipModal from "../components/AddRelationshipModal";
 
 const TreePage = () => {
   const { treeId } = useParams();
@@ -22,6 +23,7 @@ const TreePage = () => {
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [showCreatePersonModal, setShowCreatePersonModal] = useState(false);
   const [showEditPersonModal, setShowEditPersonModal] = useState(false);
+  const [showAddRelModal, setShowAddRelModal] = useState(false);
 
   useEffect(() => {
     if (!treeId) return;
@@ -141,6 +143,14 @@ const TreePage = () => {
         />
       )}
 
+      {showAddRelModal && selectedPerson && (
+        <AddRelationshipModal
+          sourcePerson={selectedPerson}
+          persons={persons}
+          onClose={() => setShowAddRelModal(false)}
+        />
+      )}
+
       {selectedPerson && (
         <div className={styles.details}>
           <PersonDetailsPanel
@@ -148,6 +158,7 @@ const TreePage = () => {
             onClosePanel={() => setSelectedPerson(null)}
             onEditPerson={() => setShowEditPersonModal(true)}
             onRemovePerson={handleRemovePerson}
+            onAddRelationship={() => setShowAddRelModal(true)}
           />
         </div>
       )}

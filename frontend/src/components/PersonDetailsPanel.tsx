@@ -4,9 +4,10 @@ import styles from "../styles/PersonDetailsPanel.module.css";
 type Props = {
   person: Person;
   onClosePanel: () => void;
+  onEditPerson: () => void;
 };
 
-const PersonDetailsPanel = ({ person, onClosePanel }: Props) => {
+const PersonDetailsPanel = ({ person, onClosePanel, onEditPerson }: Props) => {
   const formatDate = (date?: string) => {
     if (!date) return "Unknown";
 
@@ -41,7 +42,9 @@ const PersonDetailsPanel = ({ person, onClosePanel }: Props) => {
       </div>
 
       <div className={styles.actions}>
-        <button className={styles.secondaryBtn}>Edit Details</button>
+        <button className={styles.secondaryBtn} onClick={onEditPerson}>
+          Edit Details
+        </button>
         <button className={styles.secondaryBtn}>Add Relationship</button>
         <button className={styles.primaryBtn}>View Full Profile</button>
         <button className={styles.dangerBtn}>Remove Person</button>

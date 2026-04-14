@@ -1,4 +1,4 @@
-import { useState, useEffect, useEffectEvent } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getTreeById, type Tree } from "../services/treeService";
 import PersonDetailsPanel from "../components/PersonDetailsPanel";
@@ -8,9 +8,10 @@ import styles from "../styles/TreePage.module.css";
 import {
   createPerson,
   getAllPersons,
+  updatePerson,
   type Person,
 } from "../services/personService";
-import CreatePersonModal from "../components/CreatePersonModal";
+import PersonFormModal from "../components/PersonFormModal";
 import type { PersonFormData } from "../types/PersonFormData";
 
 const TreePage = () => {
@@ -19,6 +20,7 @@ const TreePage = () => {
   const [persons, setPersons] = useState<Person[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [showCreatePersonModal, setShowCreatePersonModal] = useState(false);
+  const [showEditPersonModal, setShowEditPersonModal] = useState(false);
 
   useEffect(() => {
     if (!treeId) return;
@@ -60,6 +62,27 @@ const TreePage = () => {
     }
   };
 
+  const handleEditPerson = async (data: PersonFormData) => {
+    if (!treeId || !selectedPerson) return;
+
+    try {
+      const res = await updatePerson({
+        treeId,
+        personId: selectedPerson.id,
+        data,
+      });
+
+      const updatedPerson = res.data;
+      const newPersons = persons.map((person) =>
+        person.id === selectedPerson.id ? updatedPerson : person,
+      );
+      setPersons(newPersons);
+      setSelectedPerson(updatedPerson);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.sidebar}>
@@ -73,9 +96,25 @@ const TreePage = () => {
         />
       </div>
       {showCreatePersonModal && (
-        <CreatePersonModal
+        <PersonFormModal
+          mode="create"
           onClose={() => setShowCreatePersonModal(false)}
-          onCreate={handleCreatePerson}
+          onSubmit={handleCreatePerson}
+        />
+      )}
+
+      {showEditPersonModal && selectedPerson && (
+        <PersonFormModal
+          mode="edit"
+          initialData={{
+            firstName: selectedPerson.firstName,
+            lastName: selectedPerson.lastName,
+            birthDate: selectedPerson.birthDate || "",
+            deathDate: selectedPerson.deathDate || "",
+            bio: selectedPerson.bio || "",
+          }}
+          onClose={() => setShowEditPersonModal(false)}
+          onSubmit={handleEditPerson}
         />
       )}
 
@@ -84,6 +123,7 @@ const TreePage = () => {
           <PersonDetailsPanel
             person={selectedPerson}
             onClosePanel={() => setSelectedPerson(null)}
+            onEditPerson={() => setShowEditPersonModal(true)}
           />
         </div>
       )}

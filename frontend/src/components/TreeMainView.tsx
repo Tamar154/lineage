@@ -50,14 +50,6 @@ const TreeMainView = ({
     onSelectPerson(clickedPerson);
   };
 
-  if (persons.length === 0) {
-    return (
-      <div className={styles.emptyState}>
-        <p>No people in this tree yet.</p>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.wrapper}>
       <button className={styles.addPersonBtn} onClick={onOpenCreatePerson}>
@@ -65,18 +57,24 @@ const TreeMainView = ({
         <span>Add Person</span>
       </button>
 
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        onNodeClick={handleNodeClick}
-        fitView
-        nodesConnectable={false}
-        nodesDraggable={false}
-        elementsSelectable={true}
-      >
-        <Controls />
-      </ReactFlow>
+      {persons.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p>No people in this tree yet.</p>
+        </div>
+      ) : (
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onNodeClick={handleNodeClick}
+          fitView
+          nodesConnectable={false}
+          nodesDraggable={false}
+          elementsSelectable={true}
+        >
+          <Controls />
+        </ReactFlow>
+      )}
     </div>
   );
 };

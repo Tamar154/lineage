@@ -15,6 +15,7 @@ import {
 import PersonFormModal from "../components/PersonFormModal";
 import type { PersonFormData } from "../types/PersonFormData";
 import AddRelationshipModal from "../components/AddRelationshipModal";
+import { createRelationship } from "../services/relationshipService";
 
 const TreePage = () => {
   const { treeId } = useParams();
@@ -108,6 +109,46 @@ const TreePage = () => {
     }
   };
 
+  const handleCreateRelationship = async (data: {
+    type: "parent" | "child" | "spouse";
+    targetPersonId: string;
+  }) => {
+    if (!treeId || !selectedPerson) return;
+
+    try {
+      if (data.type === "spouse") {
+        await createRelationship({
+          treeId,
+          type: "spouse",
+          sourcePersonId: selectedPerson.id,
+          targetPersonId: data.targetPersonId,
+        });
+      }
+
+      if (data.type === "parent") {
+        await createRelationship({
+          treeId,
+          type: "parent",
+          sourcePersonId: data.targetPersonId, // parent
+          targetPersonId: selectedPerson.id, // child
+        });
+      }
+
+      if (data.type === "child") {
+        await createRelationship({
+          treeId,
+          type: "parent",
+          sourcePersonId: selectedPerson.id, // parent
+          targetPersonId: data.targetPersonId, // child
+        });
+      }
+
+      setShowAddRelModal(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.sidebar}>
@@ -148,6 +189,7 @@ const TreePage = () => {
           sourcePerson={selectedPerson}
           persons={persons}
           onClose={() => setShowAddRelModal(false)}
+          onSubmit={handleCreateRelationship}
         />
       )}
 

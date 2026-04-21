@@ -11,9 +11,18 @@ type Props = {
   sourcePerson: Person;
   persons: Person[];
   onClose: () => void;
+  onSubmit: (data: {
+    type: "parent" | "child" | "spouse";
+    targetPersonId: string;
+  }) => void;
 };
 
-const AddRelationshipModal = ({ sourcePerson, persons, onClose }: Props) => {
+const AddRelationshipModal = ({
+  sourcePerson,
+  persons,
+  onClose,
+  onSubmit,
+}: Props) => {
   const [type, setType] = useState<"parent" | "child" | "spouse">("parent");
   const [targetPersonId, setTargetPersonId] = useState("");
 
@@ -25,14 +34,10 @@ const AddRelationshipModal = ({ sourcePerson, persons, onClose }: Props) => {
     e.preventDefault();
 
     if (!targetPersonId) return;
-    const data = {
+
+    onSubmit({
       type,
       targetPersonId,
-    };
-
-    console.log("RELATIONSHIP SUBMIT:", {
-      sourcePersonId: sourcePerson.id,
-      ...data,
     });
 
     onClose();

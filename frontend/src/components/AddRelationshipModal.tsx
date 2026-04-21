@@ -2,11 +2,6 @@ import { useState } from "react";
 import type { Person } from "../services/personService";
 import styles from "../styles/AddRelationshipModal.module.css";
 
-type RelationshipFormData = {
-  type: "parent" | "child" | "spouse";
-  targetPersonId: string;
-};
-
 type Props = {
   sourcePerson: Person;
   persons: Person[];

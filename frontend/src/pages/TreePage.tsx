@@ -1,27 +1,30 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getTreeById, type Tree } from "../services/treeService";
-import PersonDetailsPanel from "../components/PersonDetailsPanel";
-import TreeMainView from "../components/TreeMainView";
-import TreeSidebar from "../components/TreeSidebar";
-import styles from "../styles/TreePage.module.css";
+import { createRelationship } from "../services/relationshipService";
+import { getGraph, type GraphRelationship } from "../services/graphService";
 import {
   createPerson,
   deletePerson,
-  getAllPersons,
   updatePerson,
   type Person,
 } from "../services/personService";
+import PersonDetailsPanel from "../components/PersonDetailsPanel";
+import TreeMainView from "../components/TreeMainView";
+import TreeSidebar from "../components/TreeSidebar";
 import PersonFormModal from "../components/PersonFormModal";
-import type { PersonFormData } from "../types/PersonFormData";
 import AddRelationshipModal from "../components/AddRelationshipModal";
-import { createRelationship } from "../services/relationshipService";
+import type { PersonFormData } from "../types/PersonFormData";
+import styles from "../styles/TreePage.module.css";
 
 const TreePage = () => {
   const { treeId } = useParams();
   const [tree, setTree] = useState<Tree | null>(null);
+
   const [persons, setPersons] = useState<Person[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [relationships, setRelationships] = useState<GraphRelationship[]>([]);
+
   const [showCreatePersonModal, setShowCreatePersonModal] = useState(false);
   const [showEditPersonModal, setShowEditPersonModal] = useState(false);
   const [showAddRelModal, setShowAddRelModal] = useState(false);
@@ -38,29 +41,28 @@ const TreePage = () => {
       }
     };
 
-    const fetchPersons = async () => {
-      try {
-        const res = await getAllPersons({ treeId });
-        setPersons(res.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     fetchTree();
-    fetchPersons();
+    fetchGraph();
   }, [treeId]);
 
-  if (!tree) {
-    return <div>Loading...</div>;
-  }
+  const fetchGraph = async () => {
+    if (!treeId) return;
+
+    try {
+      const res = await getGraph({ treeId });
+      setPersons(res.data.persons);
+      setRelationships(res.data.relationships);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleCreatePerson = async (data: PersonFormData) => {
     if (!treeId) return;
 
     try {
-      const res = await createPerson({ treeId, data });
-      setPersons((prev) => [...prev, res.data]);
+      await createPerson({ treeId, data });
+      await fetchGraph();
     } catch (error) {
       console.error(error);
     }
@@ -98,12 +100,8 @@ const TreePage = () => {
 
     try {
       await deletePerson({ treeId, personId: selectedPerson.id });
-      const newPersons = persons.filter(
-        (person) => person.id !== selectedPerson.id,
-      );
-
-      setPersons(newPersons);
       setSelectedPerson(null);
+      await fetchGraph();
     } catch (error) {
       console.error(error);
     }
@@ -144,10 +142,15 @@ const TreePage = () => {
       }
 
       setShowAddRelModal(false);
+      await fetchGraph();
     } catch (error) {
       console.error(error);
     }
   };
+
+  if (!tree) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className={styles.wrapper}>
@@ -157,6 +160,7 @@ const TreePage = () => {
       <div className={styles.main}>
         <TreeMainView
           persons={persons}
+          relationships={relationships}
           onSelectPerson={setSelectedPerson}
           onOpenCreatePerson={() => setShowCreatePersonModal(true)}
         />

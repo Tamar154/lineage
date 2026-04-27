@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getTreeById, type Tree } from "../services/treeService";
 import { createRelationship } from "../services/relationshipService";
-import { getGraph, type GraphRelationship } from "../services/graphService";
+import { getGraph, type Relationship } from "../services/graphService";
 import {
   createPerson,
   deletePerson,
@@ -23,7 +23,7 @@ const TreePage = () => {
 
   const [persons, setPersons] = useState<Person[]>([]);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
-  const [relationships, setRelationships] = useState<GraphRelationship[]>([]);
+  const [relationships, setRelationships] = useState<Relationship[]>([]);
 
   const [showCreatePersonModal, setShowCreatePersonModal] = useState(false);
   const [showEditPersonModal, setShowEditPersonModal] = useState(false);
@@ -127,8 +127,8 @@ const TreePage = () => {
         await createRelationship({
           treeId,
           type: "parent",
-          sourcePersonId: data.targetPersonId, // parent
-          targetPersonId: selectedPerson.id, // child
+          sourcePersonId: selectedPerson.id, // parent
+          targetPersonId: data.targetPersonId, // child
         });
       }
 
@@ -136,8 +136,8 @@ const TreePage = () => {
         await createRelationship({
           treeId,
           type: "parent",
-          sourcePersonId: selectedPerson.id, // parent
-          targetPersonId: data.targetPersonId, // child
+          sourcePersonId: data.targetPersonId, // parent
+          targetPersonId: selectedPerson.id, // child
         });
       }
 

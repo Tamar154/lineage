@@ -9,7 +9,7 @@ export type GraphPerson = {
   bio?: string;
 };
 
-export type GraphRelationship = {
+export type Relationship = {
   id: string;
   personAId: string;
   personBId: string;
@@ -20,7 +20,7 @@ export type GraphData = {
   id: string;
   name: string;
   persons: GraphPerson[];
-  relationships: GraphRelationship[];
+  relationships: Relationship[];
 };
 
 type GetGraphParams = {

@@ -8,13 +8,13 @@ import {
   type NodeMouseHandler,
 } from "@xyflow/react";
 import type { Person } from "../services/personService";
-import type { GraphRelationship } from "../services/graphService";
+import type { Relationship } from "../services/graphService";
 import styles from "../styles/TreeMainView.module.css";
 import { FaPlus } from "react-icons/fa6";
 
 type Props = {
   persons: Person[];
-  relationships: GraphRelationship[];
+  relationships: Relationship[];
   onSelectPerson: (person: Person) => void;
   onOpenCreatePerson: () => void;
 };

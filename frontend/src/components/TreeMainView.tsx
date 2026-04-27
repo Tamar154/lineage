@@ -1,22 +1,27 @@
 import {
   Controls,
+  Handle,
+  Position,
   ReactFlow,
   type Edge,
   type Node,
   type NodeMouseHandler,
 } from "@xyflow/react";
 import type { Person } from "../services/personService";
-import { FaPlus } from "react-icons/fa6";
+import type { Relationship } from "../services/graphService";
 import styles from "../styles/TreeMainView.module.css";
+import { FaPlus } from "react-icons/fa6";
 
 type Props = {
   persons: Person[];
+  relationships: Relationship[];
   onSelectPerson: (person: Person) => void;
   onOpenCreatePerson: () => void;
 };
 
 const TreeMainView = ({
   persons,
+  relationships,
   onSelectPerson,
   onOpenCreatePerson,
 }: Props) => {
@@ -35,11 +40,21 @@ const TreeMainView = ({
     selectable: true,
   }));
 
-  const edges: Edge[] = [];
+  const edges: Edge[] = relationships.map((relationship) => ({
+    id: relationship.id,
+    source: relationship.personAId,
+    target: relationship.personBId,
+    label: relationship.type === "PARENT" ? "Parent" : "Spouse",
+    animated: false,
+  }));
 
   const nodeTypes = {
     person: ({ data }: { data: { fullName: string } }) => (
-      <div className={styles.personNode}>{data.fullName}</div>
+      <div className={styles.personNode}>
+        <Handle type="target" position={Position.Top} />
+        <div>{data.fullName}</div>
+        <Handle type="source" position={Position.Bottom} />
+      </div>
     ),
   };
 
@@ -50,14 +65,6 @@ const TreeMainView = ({
     onSelectPerson(clickedPerson);
   };
 
-  if (persons.length === 0) {
-    return (
-      <div className={styles.emptyState}>
-        <p>No people in this tree yet.</p>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.wrapper}>
       <button className={styles.addPersonBtn} onClick={onOpenCreatePerson}>
@@ -65,18 +72,24 @@ const TreeMainView = ({
         <span>Add Person</span>
       </button>
 
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        onNodeClick={handleNodeClick}
-        fitView
-        nodesConnectable={false}
-        nodesDraggable={false}
-        elementsSelectable={true}
-      >
-        <Controls />
-      </ReactFlow>
+      {persons.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p>No people in this tree yet.</p>
+        </div>
+      ) : (
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={nodeTypes}
+          onNodeClick={handleNodeClick}
+          fitView
+          nodesConnectable={false}
+          nodesDraggable={false}
+          elementsSelectable={true}
+        >
+          <Controls />
+        </ReactFlow>
+      )}
     </div>
   );
 };

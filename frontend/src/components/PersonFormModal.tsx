@@ -1,19 +1,26 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import type { PersonFormData } from "../types/PersonFormData";
-import styles from "../styles/CreatePersonModal.module.css";
+import styles from "../styles/PersonFormModal.module.css";
 
 type Props = {
+  mode: "create" | "edit";
+  initialData?: PersonFormData;
   onClose: () => void;
-  onCreate: (data: PersonFormData) => Promise<void>;
+  onSubmit: (data: PersonFormData) => Promise<void>;
 };
 
-const CreatePersonModal = ({ onClose, onCreate }: Props) => {
+const emptyForm: PersonFormData = {
+  firstName: "",
+  lastName: "",
+  birthDate: "",
+  deathDate: "",
+  bio: "",
+};
+
+const PersonFormModal = ({ mode, initialData, onClose, onSubmit }: Props) => {
   const [formData, setFormData] = useState<PersonFormData>({
-    firstName: "",
-    lastName: "",
-    birthDate: "",
-    deathDate: "",
-    bio: "",
+    ...emptyForm,
+    ...initialData,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,7 +45,7 @@ const CreatePersonModal = ({ onClose, onCreate }: Props) => {
     try {
       setIsSubmitting(true);
 
-      await onCreate({
+      await onSubmit({
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         birthDate: formData.birthDate || undefined,
@@ -53,10 +60,14 @@ const CreatePersonModal = ({ onClose, onCreate }: Props) => {
     }
   };
 
+  const title = mode === "create" ? "Add Person" : "Edit Person";
+  const submitLabel = mode === "create" ? "Create" : "Save Changes";
+  const submittingLabel = mode === "create" ? "Creating..." : "Saving...";
+
   return (
     <div className={styles.wrapper}>
       <form className={styles.form} onSubmit={handleSubmit}>
-        <h2>Add Person</h2>
+        <h2>{title}</h2>
         <div className={styles.formGroup}>
           <label htmlFor="firstName">First Name</label>
           <input
@@ -128,7 +139,7 @@ const CreatePersonModal = ({ onClose, onCreate }: Props) => {
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Creating..." : "Create"}
+            {isSubmitting ? submittingLabel : submitLabel}
           </button>
         </div>
       </form>
@@ -136,4 +147,4 @@ const CreatePersonModal = ({ onClose, onCreate }: Props) => {
   );
 };
 
-export default CreatePersonModal;
+export default PersonFormModal;

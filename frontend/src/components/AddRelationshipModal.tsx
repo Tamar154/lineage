@@ -1,15 +1,52 @@
 import { useState } from "react";
 import type { Person } from "../services/personService";
+import SearchPerson from "./SearchPerson";
+
 import styles from "../styles/AddRelationshipModal.module.css";
+import type { IconType } from "react-icons";
+import { TbArrowUpCircle } from "react-icons/tb";
+import { TbArrowDownCircle } from "react-icons/tb";
+import { FaRegHeart } from "react-icons/fa";
 
 type Props = {
   sourcePerson: Person;
   persons: Person[];
   onClose: () => void;
-  onSubmit: (data: {
-    type: "parent" | "child" | "spouse";
-    targetPersonId: string;
-  }) => void;
+  onSubmit: (data: { type: RelType; targetPersonIds: string[] }) => void;
+};
+
+type RelType = "child" | "parent" | "spouse";
+
+const REL_OPTIONS: {
+  value: RelType;
+  label: string;
+  description: string;
+  icon: IconType;
+}[] = [
+  {
+    value: "child",
+    label: "Child of",
+    description: "Add a parent to this person",
+    icon: TbArrowUpCircle,
+  },
+  {
+    value: "parent",
+    label: "Parent of",
+    description: "Add a child to this person",
+    icon: TbArrowDownCircle,
+  },
+  {
+    value: "spouse",
+    label: "Spouse of",
+    description: "Add a spouse to this person",
+    icon: FaRegHeart,
+  },
+];
+
+const MAX_TARGETS: Record<RelType, number | null> = {
+  child: 2,
+  parent: null, // unlimited
+  spouse: 1,
 };
 
 const AddRelationshipModal = ({
@@ -18,66 +55,82 @@ const AddRelationshipModal = ({
   onClose,
   onSubmit,
 }: Props) => {
-  const [type, setType] = useState<"parent" | "child" | "spouse">("parent");
-  const [targetPersonId, setTargetPersonId] = useState("");
+  const [targetPersonIds, setTargetPersonIds] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState<RelType>("parent");
 
   const availablePersons = persons.filter(
     (person) => person.id !== sourcePerson.id,
   );
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!targetPersonId) return;
+  const handleSubmit = () => {
+    if (targetPersonIds.length === 0) return;
 
     onSubmit({
-      type,
-      targetPersonId,
+      type: selectedType,
+      targetPersonIds,
     });
 
     onClose();
   };
 
+  const handleSelect = (person: Person) => {
+    setTargetPersonIds((prev) => {
+      const alreadySelected = prev.includes(person.id);
+
+      if (alreadySelected) {
+        return prev.filter((id) => id !== person.id);
+      }
+
+      const max = MAX_TARGETS[selectedType];
+
+      if (max !== null && prev.length >= max) {
+        return prev;
+      }
+
+      return [...prev, person.id];
+    });
+  };
+
+  const fullName = `${sourcePerson.firstName} ${sourcePerson.lastName}`;
+
   return (
     <div className={styles.wrapper}>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <h2 className={styles.title}>Add Relationship</h2>
-
-        <p className={styles.text}>
-          {sourcePerson.firstName} {sourcePerson.lastName}
-        </p>
-
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Relationship Type</label>
-          <select
-            className={styles.select}
-            value={type}
-            onChange={(e) =>
-              setType(e.target.value as "parent" | "child" | "spouse")
-            }
-          >
-            <option value="parent">Parent</option>
-            <option value="child">Child</option>
-            <option value="spouse">Spouse</option>
-          </select>
+      <div className={styles.modal}>
+        <div className={styles.header}>
+          <p>Add relationship for {fullName}</p>
+          <small>{fullName} is a...</small>
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Target Person</label>
-          <select
-            className={styles.select}
-            value={targetPersonId}
-            onChange={(e) => setTargetPersonId(e.target.value)}
-            required
-          >
-            <option value="">Select a person</option>
+        <div className={styles.relType}>
+          {REL_OPTIONS.map((opt) => {
+            const Icon = opt.icon;
 
-            {availablePersons.map((person) => (
-              <option key={person.id} value={person.id}>
-                {person.firstName} {person.lastName}
-              </option>
-            ))}
-          </select>
+            return (
+              <button
+                className={`${styles.typeButton} ${selectedType === opt.value ? styles.typeButtonSelected : ""}`}
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  setSelectedType(opt.value);
+                  setTargetPersonIds([]);
+                }}
+              >
+                <Icon className={styles.icon} />
+                <span>
+                  <p>{opt.label}</p>
+                  <small>{opt.description}</small>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className={styles.search}>
+          <SearchPerson
+            persons={availablePersons}
+            selectedPersonIds={targetPersonIds}
+            onSelect={handleSelect}
+          />
         </div>
 
         <div className={styles.actions}>
@@ -85,11 +138,15 @@ const AddRelationshipModal = ({
             Cancel
           </button>
 
-          <button className={styles.submitBtn} type="submit">
-            Add
+          <button
+            className={styles.confirmBtn}
+            disabled={targetPersonIds.length === 0}
+            onClick={handleSubmit}
+          >
+            Confirm
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

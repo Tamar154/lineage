@@ -8,9 +8,163 @@
   z-index: 1000;
 }
 
+.modal {
+  width: 420px;
+  max-width: 90vw;
+
+  max-height: 90vh;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  border-radius: 14px;
+  background-color: white;
+  box-sizing: border-box;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* RELATIONSHIP SELECT BUTTONS */
+.relType {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.typeButton {
+  /* display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+
+  background-color: #fafafa;
+  border: 1px gray;
+  border-radius: 10px; */
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.typeButton:hover {
+  border-color: #d1d5db;
+  background: #f3f4f6;
+}
+
+.typeButtonSelected {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.typeButtonSelected:hover {
+  border-color: #15803d;
+  background: #dcfce7;
+}
+
+.icon {
+  text-align: center;
+  font-size: x-large;
+}
+
+.typeButton p {
+  font-size: medium;
+  font-weight: bold;
+  color: black;
+}
+.typeButton span {
+  text-align: left;
+  font-size: medium;
+}
+
+/* SEARCH AREA */
+.search {
+  height: 30vh;
+  min-height: 0;
+  /* overflow-y: auto; */
+}
+
+/* BOTTOM BUTTONS */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.cancelBtn,
+.confirmBtn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    background-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.cancelBtn {
+  background-color: #e2e8f0;
+  color: #334155;
+}
+
+.cancelBtn:hover {
+  background-color: #cbd5e1;
+}
+
+.confirmBtn {
+  background-color: #16a34a;
+  color: white;
+}
+
+.inactiveBtn {
+  background-color: #16a34a;
+  color: white;
+}
+
+.confirmBtn:hover {
+  background-color: #15803d;
+}
+
+.confirmBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cancelBtn:hover,
+.confirmBtn:hover {
+  transform: translateY(-1px);
+}
+
+/* .wrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.18);
+  z-index: 1000;
+}
+
 .form {
   width: 420px;
   max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -110,4 +264,4 @@
 .cancelBtn:hover,
 .submitBtn:hover {
   transform: translateY(-1px);
-}
+} */

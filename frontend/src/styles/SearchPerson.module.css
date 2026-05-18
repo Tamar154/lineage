@@ -1,0 +1,77 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: 10px;
+}
+
+.searchSection {
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  font: inherit;
+  color: #111827;
+  background: white;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+}
+
+.personList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding-right: 4px;
+}
+
+.personItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 7px 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  color: #111827;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.personItem:hover {
+  background: #f3f4f6;
+}
+
+.personItemSelected {
+  background: #f0fdf4;
+  border-color: #16a34a;
+}
+
+.personItemSelected:hover {
+  background: #dcfce7;
+}
+
+.emptyText {
+  margin: 0;
+  padding: 8px 4px;
+  font-size: 14px;
+  color: #6b7280;
+}

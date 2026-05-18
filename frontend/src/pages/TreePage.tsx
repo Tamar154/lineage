@@ -109,37 +109,39 @@ const TreePage = () => {
 
   const handleCreateRelationship = async (data: {
     type: "parent" | "child" | "spouse";
-    targetPersonId: string;
+    targetPersonIds: string[];
   }) => {
     if (!treeId || !selectedPerson) return;
 
     try {
-      if (data.type === "spouse") {
-        await createRelationship({
-          treeId,
-          type: "spouse",
-          sourcePersonId: selectedPerson.id,
-          targetPersonId: data.targetPersonId,
-        });
-      }
+      await Promise.all(
+        data.targetPersonIds.map((targetPersonId) => {
+          if (data.type === "spouse") {
+            return createRelationship({
+              treeId,
+              type: "spouse",
+              sourcePersonId: selectedPerson.id,
+              targetPersonId,
+            });
+          }
 
-      if (data.type === "parent") {
-        await createRelationship({
-          treeId,
-          type: "parent",
-          sourcePersonId: selectedPerson.id, // parent
-          targetPersonId: data.targetPersonId, // child
-        });
-      }
+          if (data.type === "parent") {
+            return createRelationship({
+              treeId,
+              type: "parent",
+              sourcePersonId: selectedPerson.id,
+              targetPersonId,
+            });
+          }
 
-      if (data.type === "child") {
-        await createRelationship({
-          treeId,
-          type: "parent",
-          sourcePersonId: data.targetPersonId, // parent
-          targetPersonId: selectedPerson.id, // child
-        });
-      }
+          return createRelationship({
+            treeId,
+            type: "parent",
+            sourcePersonId: targetPersonId,
+            targetPersonId: selectedPerson.id,
+          });
+        }),
+      );
 
       setShowAddRelModal(false);
       await fetchGraph();

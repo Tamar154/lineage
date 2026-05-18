@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import AppLogo from "./AppLogo";
 import { IoIosArrowBack } from "react-icons/io";
 import type { Person } from "../services/personService";

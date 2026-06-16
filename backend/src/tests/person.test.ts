@@ -25,9 +25,11 @@ describe("Person", () => {
   const validPerson = {
     firstName: "Alice",
     lastName: "Smith",
+    gender: "female",
     birthDate: "1990-05-15",
     deathDate: null,
-    bio: "Some bio",
+    birthPlace: "Springfield",
+    biography: "Some biography",
   };
 
   async function createPerson(
@@ -48,6 +50,9 @@ describe("Person", () => {
       expect(res.body.status).toBe("success");
       expect(res.body.data.firstName).toBe(validPerson.firstName);
       expect(res.body.data.lastName).toBe(validPerson.lastName);
+      expect(res.body.data.gender).toBe(validPerson.gender);
+      expect(res.body.data.birthPlace).toBe(validPerson.birthPlace);
+      expect(res.body.data.biography).toBe(validPerson.biography);
 
       // Verify in DB
       const person = await prisma.person.findUnique({
@@ -57,30 +62,61 @@ describe("Person", () => {
       expect(person!.treeId).toBe(treeId);
     });
 
-    it("should create a person with only required fields", async () => {
+    it("should create a person with only firstName", async () => {
       const res = await createPerson({
+        lastName: undefined,
+        gender: undefined,
         birthDate: undefined,
         deathDate: undefined,
-        bio: undefined,
+        birthPlace: undefined,
+        biography: undefined,
       });
 
       expect(res.status).toBe(201);
+      expect(res.body.data.lastName).toBeNull();
+      expect(res.body.data.gender).toBeNull();
       expect(res.body.data.birthDate).toBeNull();
       expect(res.body.data.deathDate).toBeNull();
-      expect(res.body.data.bio).toBeNull();
+      expect(res.body.data.birthPlace).toBeNull();
+      expect(res.body.data.biography).toBeNull();
+    });
+
+    it("should create a person when optional fields are null", async () => {
+      const res = await createPerson({
+        lastName: null,
+        gender: null,
+        birthDate: null,
+        deathDate: null,
+        birthPlace: null,
+        biography: null,
+      });
+
+      expect(res.status).toBe(201);
+      expect(res.body.data.lastName).toBeNull();
+      expect(res.body.data.gender).toBeNull();
+      expect(res.body.data.birthDate).toBeNull();
+      expect(res.body.data.deathDate).toBeNull();
+      expect(res.body.data.birthPlace).toBeNull();
+      expect(res.body.data.biography).toBeNull();
     });
 
     it("should create a person with all optional fields", async () => {
       const res = await createPerson({
+        lastName: "Smith",
+        gender: "female",
         birthDate: "1990-01-01",
         deathDate: "2020-01-01",
-        bio: "A full biography",
+        birthPlace: "Springfield",
+        biography: "A full biography",
       });
 
       expect(res.status).toBe(201);
+      expect(res.body.data.lastName).toBe("Smith");
+      expect(res.body.data.gender).toBe("female");
       expect(res.body.data.birthDate).toBeDefined();
       expect(res.body.data.deathDate).toBeDefined();
-      expect(res.body.data.bio).toBe("A full biography");
+      expect(res.body.data.birthPlace).toBe("Springfield");
+      expect(res.body.data.biography).toBe("A full biography");
     });
 
     it("should not allow unauthenticated users to create a person", async () => {
@@ -116,10 +152,11 @@ describe("Person", () => {
       expect(res.status).toBe(400);
     });
 
-    it("should fail when lastName is missing", async () => {
+    it("should allow missing lastName", async () => {
       const res = await createPerson({ lastName: undefined });
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(201);
+      expect(res.body.data.lastName).toBeNull();
     });
 
     it("should fail when firstName is empty string", async () => {
@@ -130,6 +167,24 @@ describe("Person", () => {
 
     it("should fail when lastName is empty string", async () => {
       const res = await createPerson({ lastName: "" });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should fail when gender is empty string", async () => {
+      const res = await createPerson({ gender: "" });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should fail when birthPlace is empty string", async () => {
+      const res = await createPerson({ birthPlace: "" });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should fail when biography is empty string", async () => {
+      const res = await createPerson({ biography: "" });
 
       expect(res.status).toBe(400);
     });

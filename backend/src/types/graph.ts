@@ -8,10 +8,12 @@ export type GraphResponse = {
     persons: {
       id: string;
       firstName: string;
-      lastName: string;
+      lastName: string | null;
+      gender: string | null;
       birthDate: Date | null;
       deathDate: Date | null;
-      bio: string | null;
+      birthPlace: string | null;
+      biography: string | null;
     }[];
     relationships: {
       id: string;

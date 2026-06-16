@@ -3,10 +3,12 @@ export type PersonResponse = {
   data: {
     id: string;
     firstName: string;
-    lastName: string;
+    lastName: string | null;
+    gender: string | null;
     birthDate: Date | null;
     deathDate: Date | null;
-    bio: string | null;
+    birthPlace: string | null;
+    biography: string | null;
   };
 };
 
@@ -15,9 +17,11 @@ export type PersonsResponse = {
   data: {
     id: string;
     firstName: string;
-    lastName: string;
+    lastName: string | null;
+    gender: string | null;
     birthDate: Date | null;
     deathDate: Date | null;
-    bio: string | null;
+    birthPlace: string | null;
+    biography: string | null;
   }[];
 };

@@ -13,15 +13,25 @@ const createPerson: RequestHandler<
   PersonResponse,
   CreatePersonInput
 > = async (req, res) => {
-  const { firstName, lastName, birthDate, deathDate, bio } = req.body;
+  const {
+    firstName,
+    lastName,
+    gender,
+    birthDate,
+    deathDate,
+    birthPlace,
+    biography,
+  } = req.body;
 
   const person = await prisma.person.create({
     data: {
       firstName,
-      lastName,
+      lastName: lastName ?? null,
+      gender: gender ?? null,
       birthDate: birthDate ?? null,
       deathDate: deathDate ?? null,
-      bio: bio ?? null,
+      birthPlace: birthPlace ?? null,
+      biography: biography ?? null,
       treeId: req.tree.id,
     },
   });
@@ -32,9 +42,11 @@ const createPerson: RequestHandler<
       id: person.id,
       firstName: person.firstName,
       lastName: person.lastName,
+      gender: person.gender,
       birthDate: person.birthDate,
       deathDate: person.deathDate,
-      bio: person.bio,
+      birthPlace: person.birthPlace,
+      biography: person.biography,
     },
   });
 };
@@ -48,9 +60,11 @@ const getPersons: RequestHandler = async (req, res) => {
       id: true,
       firstName: true,
       lastName: true,
+      gender: true,
       birthDate: true,
       deathDate: true,
-      bio: true,
+      birthPlace: true,
+      biography: true,
     },
   });
 
@@ -73,9 +87,11 @@ const getPersonById: RequestHandler<PersonParams> = async (req, res) => {
       id: person.id,
       firstName: person.firstName,
       lastName: person.lastName,
+      gender: person.gender,
       birthDate: person.birthDate,
       deathDate: person.deathDate,
-      bio: person.bio,
+      birthPlace: person.birthPlace,
+      biography: person.biography,
     },
   });
 };
@@ -94,7 +110,15 @@ const updatePerson: RequestHandler<
 
   if (!existingPerson) throw new AppError("Person not found", 404);
 
-  const { firstName, lastName, birthDate, deathDate, bio } = req.body;
+  const {
+    firstName,
+    lastName,
+    gender,
+    birthDate,
+    deathDate,
+    birthPlace,
+    biography,
+  } = req.body;
 
   const person = await prisma.person.update({
     where: {
@@ -102,10 +126,12 @@ const updatePerson: RequestHandler<
     },
     data: {
       firstName,
-      lastName,
+      lastName: lastName ?? null,
+      gender: gender ?? null,
       birthDate: birthDate ?? null,
       deathDate: deathDate ?? null,
-      bio: bio ?? null,
+      birthPlace: birthPlace ?? null,
+      biography: biography ?? null,
     },
   });
 
@@ -115,9 +141,11 @@ const updatePerson: RequestHandler<
       id: person.id,
       firstName: person.firstName,
       lastName: person.lastName,
+      gender: person.gender,
       birthDate: person.birthDate,
       deathDate: person.deathDate,
-      bio: person.bio,
+      birthPlace: person.birthPlace,
+      biography: person.biography,
     },
   });
 };

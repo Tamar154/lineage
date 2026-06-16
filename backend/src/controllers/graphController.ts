@@ -18,9 +18,11 @@ export const getGraph: RequestHandler<
           id: true,
           firstName: true,
           lastName: true,
+          gender: true,
           birthDate: true,
           deathDate: true,
-          bio: true,
+          birthPlace: true,
+          biography: true,
         },
       },
       relationships: {

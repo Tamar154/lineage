@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Person } from "../services/personService";
 import styles from "../styles/SearchPerson.module.css";
 import Avatar from "./Avatar";
+import { getPersonDisplayName } from "../utils/personName";
 
 type Props = {
   persons: Person[];
@@ -13,7 +14,7 @@ const SearchPerson = ({ persons, selectedPersonIds, onSelect }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredPersons = persons.filter((person) => {
-    const fullName = `${person.firstName} ${person.lastName}`.toLowerCase();
+    const fullName = getPersonDisplayName(person).toLowerCase();
     return fullName.includes(searchQuery.toLowerCase());
   });
 
@@ -32,6 +33,7 @@ const SearchPerson = ({ persons, selectedPersonIds, onSelect }: Props) => {
         {filteredPersons.length === 0 && <p>No people match your search.</p>}
         {filteredPersons.map((person) => {
           const isSelected = selectedPersonIds?.includes(person.id);
+          const displayName = getPersonDisplayName(person);
 
           return (
             <div
@@ -39,8 +41,8 @@ const SearchPerson = ({ persons, selectedPersonIds, onSelect }: Props) => {
               key={person.id}
               onClick={() => onSelect?.(person)}
             >
-              <Avatar name={`${person.firstName} ${person.lastName}`} />
-              {person.firstName} {person.lastName}
+              <Avatar name={displayName} />
+              {displayName}
             </div>
           );
         })}

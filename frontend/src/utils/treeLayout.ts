@@ -2,6 +2,7 @@ import ELK from "elkjs";
 import type { Edge, Node } from "@xyflow/react";
 import type { Person } from "../services/personService";
 import type { Relationship } from "../services/graphService";
+import { getPersonDisplayName } from "./personName";
 
 const elk = new ELK();
 
@@ -69,7 +70,7 @@ export async function layoutTree(
   // Helper for full names
   const fullName = (id: string) => {
     const p = personById.get(id)!;
-    return `${p.firstName} ${p.lastName}`;
+    return getPersonDisplayName(p);
   };
 
   const parentRels = relationships.filter((r) => r.type === "PARENT");

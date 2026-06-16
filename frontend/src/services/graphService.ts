@@ -3,10 +3,12 @@ import api from "../api/axios";
 export type GraphPerson = {
   id: string;
   firstName: string;
-  lastName: string;
-  birthDate?: string;
-  deathDate?: string;
-  bio?: string;
+  lastName: string | null;
+  gender: string | null;
+  birthDate: string | null;
+  deathDate: string | null;
+  birthPlace: string | null;
+  biography: string | null;
 };
 
 export type Relationship = {

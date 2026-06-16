@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getTreeById, type Tree } from "../services/treeService";
 import { createRelationship } from "../services/relationshipService";
@@ -16,6 +16,7 @@ import PersonFormModal from "../components/PersonFormModal";
 import AddRelationshipModal from "../components/AddRelationshipModal";
 import type { PersonFormData } from "../types/PersonFormData";
 import styles from "../styles/TreePage.module.css";
+import { getPersonDisplayName } from "../utils/personName";
 
 const TreePage = () => {
   const { treeId } = useParams();
@@ -28,6 +29,18 @@ const TreePage = () => {
   const [showCreatePersonModal, setShowCreatePersonModal] = useState(false);
   const [showEditPersonModal, setShowEditPersonModal] = useState(false);
   const [showAddRelModal, setShowAddRelModal] = useState(false);
+
+  const fetchGraph = useCallback(async () => {
+    if (!treeId) return;
+
+    try {
+      const res = await getGraph({ treeId });
+      setPersons(res.data.persons);
+      setRelationships(res.data.relationships);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [treeId]);
 
   useEffect(() => {
     if (!treeId) return;
@@ -42,20 +55,9 @@ const TreePage = () => {
     };
 
     fetchTree();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchGraph();
-  }, [treeId]);
-
-  const fetchGraph = async () => {
-    if (!treeId) return;
-
-    try {
-      const res = await getGraph({ treeId });
-      setPersons(res.data.persons);
-      setRelationships(res.data.relationships);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  }, [fetchGraph, treeId]);
 
   const handleCreatePerson = async (data: PersonFormData) => {
     if (!treeId) return;
@@ -92,8 +94,9 @@ const TreePage = () => {
   const handleRemovePerson = async () => {
     if (!treeId || !selectedPerson) return;
 
+    const displayName = getPersonDisplayName(selectedPerson);
     const isConfirmed = window.confirm(
-      `Are you sure you want to remove ${selectedPerson.firstName} ${selectedPerson.lastName}?`,
+      `Are you sure you want to remove ${displayName}?`,
     );
 
     if (!isConfirmed) return;
@@ -180,10 +183,12 @@ const TreePage = () => {
           mode="edit"
           initialData={{
             firstName: selectedPerson.firstName,
-            lastName: selectedPerson.lastName,
+            lastName: selectedPerson.lastName ?? "",
+            gender: selectedPerson.gender ?? "",
             birthDate: selectedPerson.birthDate || "",
             deathDate: selectedPerson.deathDate || "",
-            bio: selectedPerson.bio || "",
+            birthPlace: selectedPerson.birthPlace ?? "",
+            biography: selectedPerson.biography ?? "",
           }}
           onClose={() => setShowEditPersonModal(false)}
           onSubmit={handleEditPerson}

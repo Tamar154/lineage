@@ -1,5 +1,6 @@
 import type { Person } from "../services/personService";
 import styles from "../styles/PersonDetailsPanel.module.css";
+import { getPersonDisplayName } from "../utils/personName";
 
 type Props = {
   person: Person;
@@ -16,11 +17,13 @@ const PersonDetailsPanel = ({
   onRemovePerson,
   onAddRelationship,
 }: Props) => {
-  const formatDate = (date?: string) => {
+  const formatDate = (date?: string | null) => {
     if (!date) return "Unknown";
 
     return new Date(date).toLocaleDateString();
   };
+
+  const displayName = getPersonDisplayName(person);
 
   return (
     <div className={styles.wrapper}>
@@ -36,17 +39,19 @@ const PersonDetailsPanel = ({
       </div>
 
       <div className={styles.mainInfo}>
-        <h2 className={styles.name}>
-          {person.firstName} {person.lastName}
-        </h2>
+        <h2 className={styles.name}>{displayName}</h2>
         <p className={styles.dates}>
           {formatDate(person.birthDate)} - {formatDate(person.deathDate)}
         </p>
+        {person.gender && <p>{person.gender}</p>}
+        {person.birthPlace && <p>Born in {person.birthPlace}</p>}
       </div>
 
       <div className={styles.section}>
         <h4 className={styles.sectionTitle}>Biography</h4>
-        <p className={styles.bio}>{person.bio || "No biography yet."}</p>
+        <p className={styles.bio}>
+          {person.biography || "No biography yet."}
+        </p>
       </div>
 
       <div className={styles.actions}>

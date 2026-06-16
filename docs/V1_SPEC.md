@@ -5,7 +5,7 @@ LineAge v1 supports:
 - people with first name required
 - optional last name, gender, birth date, death date, birth place, biography
 - relationships: parent/child/spouse
-- internally relationships are PARENT_CHILD or SPOUSE
+- internally relationships are PARENT or SPOUSE
 - max 1 spouse per person
 - max 2 parents per child
 - no parent-child cycles

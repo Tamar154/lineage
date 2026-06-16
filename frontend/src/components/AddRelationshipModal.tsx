@@ -7,6 +7,7 @@ import type { IconType } from "react-icons";
 import { TbArrowUpCircle } from "react-icons/tb";
 import { TbArrowDownCircle } from "react-icons/tb";
 import { FaRegHeart } from "react-icons/fa";
+import { getPersonDisplayName } from "../utils/personName";
 
 type Props = {
   sourcePerson: Person;
@@ -91,7 +92,7 @@ const AddRelationshipModal = ({
     });
   };
 
-  const fullName = `${sourcePerson.firstName} ${sourcePerson.lastName}`;
+  const fullName = getPersonDisplayName(sourcePerson);
 
   return (
     <div className={styles.wrapper}>

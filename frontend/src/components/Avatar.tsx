@@ -21,8 +21,11 @@ const generateColor = (id: string): [string, string] => {
 };
 
 const getInitials = (name: string): string => {
-  const parts = name.trim().split(" ");
-  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const firstInitial = parts[0]?.[0] ?? "?";
+  const secondInitial = parts[1]?.[0] ?? "";
+
+  return `${firstInitial}${secondInitial}`.toUpperCase();
 };
 
 const Avatar = ({ name, size = 40 }: Props) => {

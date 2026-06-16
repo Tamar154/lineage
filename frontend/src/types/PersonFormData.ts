@@ -1,7 +1,9 @@
 export type PersonFormData = {
   firstName: string;
-  lastName: string;
+  lastName?: string;
+  gender?: string;
   birthDate?: string;
   deathDate?: string;
-  bio?: string;
+  birthPlace?: string;
+  biography?: string;
 };

@@ -8,7 +8,9 @@ import { RelationshipType } from "../generated/prisma/index.js";
  * - A person cannot have a relationship with themselves.
  * - Both persons must belong to the same tree.
  * - The same relationship cannot already exist.
- * - For parent-child relationships, circular relationships are not allowed (e.g., A cannot be a parent of B if B is already a parent of A).
+ * - A person can have at most one spouse.
+ * - A child can have at most two parents.
+ * - For parent-child relationships, circular relationships are not allowed.
  * If any of these conditions are violated, an AppError is thrown with an appropriate message and status code.
  *
  * @param personAId - The ID of the first person in the relationship.
@@ -58,22 +60,75 @@ export async function validateRelationship(
     throw new AppError("This relationship already exists", 400);
   }
 
-  if (type === RelationshipType.PARENT) {
-    const circular = await prisma.relationship.findFirst({
+  if (type === RelationshipType.SPOUSE) {
+    const existingSpouse = await prisma.relationship.findFirst({
       where: {
         treeId,
-        type: RelationshipType.PARENT,
-        personAId: personBId,
-        personBId: personAId,
+        type: RelationshipType.SPOUSE,
+        OR: [
+          { personAId },
+          { personBId: personAId },
+          { personAId: personBId },
+          { personBId },
+        ],
         ...(currentRelId && { NOT: { id: currentRelId } }),
       },
     });
 
-    if (circular) {
-      throw new AppError(
-        "Circular parent-child relationships are not allowed",
-        400,
-      );
+    if (existingSpouse) {
+      throw new AppError("A person can have at most one spouse", 400);
+    }
+  }
+
+  if (type === RelationshipType.PARENT) {
+    const parentCount = await prisma.relationship.count({
+      where: {
+        treeId,
+        type: RelationshipType.PARENT,
+        personBId,
+        ...(currentRelId && { NOT: { id: currentRelId } }),
+      },
+    });
+
+    if (parentCount >= 2) {
+      throw new AppError("A child can have at most two parents", 400);
+    }
+
+    const parentRelationships = await prisma.relationship.findMany({
+      where: {
+        treeId,
+        type: RelationshipType.PARENT,
+        ...(currentRelId && { NOT: { id: currentRelId } }),
+      },
+      select: {
+        personAId: true,
+        personBId: true,
+      },
+    });
+
+    const childrenByParent = new Map<string, string[]>();
+    for (const relationship of parentRelationships) {
+      const children = childrenByParent.get(relationship.personAId) ?? [];
+      children.push(relationship.personBId);
+      childrenByParent.set(relationship.personAId, children);
+    }
+
+    const visited = new Set<string>();
+    const stack = [personBId];
+
+    while (stack.length > 0) {
+      const currentPersonId = stack.pop();
+      if (!currentPersonId || visited.has(currentPersonId)) continue;
+
+      if (currentPersonId === personAId) {
+        throw new AppError(
+          "Circular parent-child relationships are not allowed",
+          400,
+        );
+      }
+
+      visited.add(currentPersonId);
+      stack.push(...(childrenByParent.get(currentPersonId) ?? []));
     }
   }
 }

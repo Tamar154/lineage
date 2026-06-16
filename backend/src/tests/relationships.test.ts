@@ -11,6 +11,7 @@ describe("Relationship", () => {
   let personAId: string;
   let personBId: string;
   let personCId: string;
+  let personDId: string;
 
   beforeEach(async () => {
     user = createUserAgent();
@@ -36,6 +37,11 @@ describe("Relationship", () => {
       .post(`/api/trees/${treeId}/persons`)
       .send({ firstName: "Charlie", lastName: "Smith" });
     personCId = personC.body.data.id;
+
+    const personD = await user.agent
+      .post(`/api/trees/${treeId}/persons`)
+      .send({ firstName: "Dana", lastName: "Smith" });
+    personDId = personD.body.data.id;
   });
 
   async function createRelationship(
@@ -89,7 +95,7 @@ describe("Relationship", () => {
       expect([rel!.personAId, rel!.personBId]).toContain(personBId);
     });
 
-    it("should reject a self-relationship", async () => {
+    it("should block a self relationship", async () => {
       const res = await createRelationship({
         personAId,
         personBId: personAId,
@@ -113,7 +119,7 @@ describe("Relationship", () => {
       expect(res.body.message).toMatch(/belong to the same tree/i);
     });
 
-    it("should reject if persons belong to different trees", async () => {
+    it("should block a relationship with a person from another tree", async () => {
       const tree2Res = await user.agent
         .post("/api/trees")
         .send({ name: "Other Tree" });
@@ -131,7 +137,7 @@ describe("Relationship", () => {
       expect(res.body.message).toMatch(/belong to the same tree/i);
     });
 
-    it("should reject an exact duplicate SPOUSE relationship", async () => {
+    it("should block an exact duplicate spouse relationship", async () => {
       await createRelationship({ type: "SPOUSE" });
       const res = await createRelationship({ type: "SPOUSE" });
 
@@ -139,7 +145,7 @@ describe("Relationship", () => {
       expect(res.body.message).toMatch(/already exists/i);
     });
 
-    it("should reject a reversed SPOUSE relationship (B,A) when (A,B) exists", async () => {
+    it("should block a reverse spouse duplicate", async () => {
       await createRelationship({ personAId, personBId, type: "SPOUSE" });
 
       const res = await createRelationship({
@@ -152,7 +158,20 @@ describe("Relationship", () => {
       expect(res.body.message).toMatch(/already exists/i);
     });
 
-    it("should reject an exact duplicate PARENT relationship", async () => {
+    it("should block a person from having two spouses", async () => {
+      await createRelationship({ personAId, personBId, type: "SPOUSE" });
+
+      const res = await createRelationship({
+        personAId,
+        personBId: personCId,
+        type: "SPOUSE",
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/one spouse/i);
+    });
+
+    it("should block an exact duplicate parent relationship", async () => {
       await createRelationship({ type: "PARENT" });
       const res = await createRelationship({ type: "PARENT" });
 
@@ -160,7 +179,7 @@ describe("Relationship", () => {
       expect(res.body.message).toMatch(/already exists/i);
     });
 
-    it("should reject a logically impossible reverse PARENT (child cannot be parent's parent)", async () => {
+    it("should block a direct parent-child cycle", async () => {
       await createRelationship({ personAId, personBId, type: "PARENT" });
 
       const res = await createRelationship({
@@ -184,7 +203,7 @@ describe("Relationship", () => {
       expect(res.status).toBe(201);
     });
 
-    it("should allow A to be parent of C and B to be parent of C (two parents)", async () => {
+    it("should allow a valid second parent", async () => {
       await createRelationship({
         personAId,
         personBId: personCId,
@@ -194,6 +213,50 @@ describe("Relationship", () => {
         personAId: personBId,
         personBId: personCId,
         type: "PARENT",
+      });
+
+      expect(res.status).toBe(201);
+    });
+
+    it("should block a child from having three parents", async () => {
+      await createRelationship({
+        personAId,
+        personBId: personCId,
+        type: "PARENT",
+      });
+      await createRelationship({
+        personAId: personBId,
+        personBId: personCId,
+        type: "PARENT",
+      });
+
+      const res = await createRelationship({
+        personAId: personDId,
+        personBId: personCId,
+        type: "PARENT",
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/two parents/i);
+    });
+
+    it("should allow a valid disconnected family group", async () => {
+      await createRelationship({ personAId, personBId, type: "PARENT" });
+      const res = await createRelationship({
+        personAId: personCId,
+        personBId: personDId,
+        type: "PARENT",
+      });
+
+      expect(res.status).toBe(201);
+    });
+
+    it("should allow a valid second spouse relationship for different people", async () => {
+      await createRelationship({ personAId, personBId, type: "SPOUSE" });
+      const res = await createRelationship({
+        personAId: personCId,
+        personBId: personDId,
+        type: "SPOUSE",
       });
 
       expect(res.status).toBe(201);
@@ -255,8 +318,7 @@ describe("Relationship", () => {
       expect(res.body.message).toMatch(/not found|permission/i);
     });
 
-    it("should not allow creating circular relationships through multiple steps", async () => {
-      // A -> B -> C -> A would be circular. Create A->B and B->C, then try to create C->A.
+    it("should block a multi-generation parent-child cycle: A parent of B, B parent of C, C parent of A", async () => {
       await createRelationship({
         personAId,
         personBId,
@@ -620,11 +682,11 @@ describe("Relationship", () => {
     });
 
     it("should reject update if resulting relationship already exists", async () => {
-      // First: A-B SPOUSE (relId). Second: A-C SPOUSE.
+      // First: A-B SPOUSE (relId). Second: C-D SPOUSE.
       // Try to update second to match first.
       const second = await createRelationship({
-        personAId,
-        personBId: personCId,
+        personAId: personCId,
+        personBId: personDId,
         type: "SPOUSE",
       });
 
@@ -639,11 +701,11 @@ describe("Relationship", () => {
     });
 
     it("should reject update if resulting SPOUSE relationship is a reverse duplicate", async () => {
-      // First: A-B SPOUSE (relId). Second: A-C SPOUSE.
+      // First: A-B SPOUSE (relId). Second: C-D SPOUSE.
       // Try to update second to B-A SPOUSE (reverse of first).
       const second = await createRelationship({
-        personAId,
-        personBId: personCId,
+        personAId: personCId,
+        personBId: personDId,
         type: "SPOUSE",
       });
 
@@ -655,6 +717,45 @@ describe("Relationship", () => {
 
       expect(res.status).toBe(400);
       expect(res.body.message).toMatch(/already exists/i);
+    });
+
+    it("should reject update if it gives a person a second spouse", async () => {
+      const second = await createRelationship({
+        personAId: personCId,
+        personBId: personDId,
+        type: "SPOUSE",
+      });
+
+      const res = await updateRelationship(second.body.data.id, {
+        personAId,
+        personBId: personCId,
+        type: "SPOUSE",
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/one spouse/i);
+    });
+
+    it("should reject update if it gives a child a third parent", async () => {
+      await createRelationship({
+        personAId,
+        personBId: personCId,
+        type: "PARENT",
+      });
+      await createRelationship({
+        personAId: personBId,
+        personBId: personCId,
+        type: "PARENT",
+      });
+
+      const res = await updateRelationship(relId, {
+        personAId: personDId,
+        personBId: personCId,
+        type: "PARENT",
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/two parents/i);
     });
 
     it("should reject logically impossible reverse PARENT on update", async () => {
@@ -669,6 +770,28 @@ describe("Relationship", () => {
 
       const res = await updateRelationship(other.body.data.id, {
         personAId: personBId,
+        personBId: personAId,
+        type: "PARENT",
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/circular/i);
+    });
+
+    it("should reject circular relationships through multiple steps on update", async () => {
+      await createRelationship({
+        personAId,
+        personBId,
+        type: "PARENT",
+      });
+      await createRelationship({
+        personAId: personBId,
+        personBId: personCId,
+        type: "PARENT",
+      });
+
+      const res = await updateRelationship(relId, {
+        personAId: personCId,
         personBId: personAId,
         type: "PARENT",
       });

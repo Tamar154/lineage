@@ -7,7 +7,7 @@ import { RelationshipType } from "../generated/prisma/index.js";
  * Checks include:
  * - A person cannot have a relationship with themselves.
  * - Both persons must belong to the same tree.
- * - The same relationship cannot already exist.
+ * - The same pair of people cannot have more than one relationship.
  * - A person can have at most one spouse.
  * - A child can have at most two parents.
  * - For parent-child relationships, circular relationships are not allowed.
@@ -46,18 +46,22 @@ export async function validateRelationship(
     throw new AppError("Both persons must belong to the same tree", 400);
   }
 
-  const existing = await prisma.relationship.findFirst({
+  const existingPair = await prisma.relationship.findFirst({
     where: {
       treeId,
-      type,
-      personAId,
-      personBId,
+      OR: [
+        { personAId, personBId },
+        { personAId: personBId, personBId: personAId },
+      ],
       ...(currentRelId && { NOT: { id: currentRelId } }),
     },
   });
 
-  if (existing) {
-    throw new AppError("This relationship already exists", 400);
+  if (existingPair) {
+    throw new AppError(
+      "A relationship between these people already exists",
+      400,
+    );
   }
 
   if (type === RelationshipType.SPOUSE) {

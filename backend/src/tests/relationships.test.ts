@@ -189,7 +189,7 @@ describe("Relationship", () => {
       });
 
       expect(res.status).toBe(400);
-      expect(res.body.message).toMatch(/circular/i);
+      expect(res.body.message).toMatch(/already exists|circular/i);
     });
 
     it("should allow A to be parent of B and A to be parent of C", async () => {
@@ -262,11 +262,16 @@ describe("Relationship", () => {
       expect(res.status).toBe(201);
     });
 
-    it("should allow A-B SPOUSE and A-B PARENT as separate relationships", async () => {
+    it("should block the same pair from having multiple relationships regardless of type or direction", async () => {
       await createRelationship({ type: "SPOUSE" });
-      const res = await createRelationship({ type: "PARENT" });
+      const res = await createRelationship({
+        personAId: personBId,
+        personBId: personAId,
+        type: "PARENT",
+      });
 
-      expect(res.status).toBe(201);
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/already exists/i);
     });
 
     it("should reject an invalid relationship type", async () => {
@@ -719,6 +724,23 @@ describe("Relationship", () => {
       expect(res.body.message).toMatch(/already exists/i);
     });
 
+    it("should reject update if resulting pair already has a relationship with a different type or direction", async () => {
+      const second = await createRelationship({
+        personAId: personCId,
+        personBId: personDId,
+        type: "SPOUSE",
+      });
+
+      const res = await updateRelationship(second.body.data.id, {
+        personAId: personBId,
+        personBId: personAId,
+        type: "PARENT",
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/already exists/i);
+    });
+
     it("should reject update if it gives a person a second spouse", async () => {
       const second = await createRelationship({
         personAId: personCId,
@@ -759,40 +781,42 @@ describe("Relationship", () => {
     });
 
     it("should reject logically impossible reverse PARENT on update", async () => {
-      // A is parent of B. Create a separate C-B PARENT, then try to update it to B-A PARENT.
-      await createRelationship({ personAId, personBId, type: "PARENT" });
-
-      const other = await createRelationship({
-        personAId: personCId,
-        personBId,
-        type: "PARENT",
-      });
-
-      const res = await updateRelationship(other.body.data.id, {
-        personAId: personBId,
-        personBId: personAId,
-        type: "PARENT",
-      });
-
-      expect(res.status).toBe(400);
-      expect(res.body.message).toMatch(/circular/i);
-    });
-
-    it("should reject circular relationships through multiple steps on update", async () => {
-      await createRelationship({
-        personAId,
-        personBId,
-        type: "PARENT",
-      });
       await createRelationship({
         personAId: personBId,
         personBId: personCId,
         type: "PARENT",
       });
+      const other = await createRelationship({
+        personAId: personDId,
+        personBId: personCId,
+        type: "PARENT",
+      });
+
+      const res = await updateRelationship(other.body.data.id, {
+        personAId: personCId,
+        personBId: personBId,
+        type: "PARENT",
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toMatch(/already exists|circular/i);
+    });
+
+    it("should reject circular relationships through multiple steps on update", async () => {
+      await createRelationship({
+        personAId: personBId,
+        personBId: personCId,
+        type: "PARENT",
+      });
+      await createRelationship({
+        personAId: personCId,
+        personBId: personDId,
+        type: "PARENT",
+      });
 
       const res = await updateRelationship(relId, {
-        personAId: personCId,
-        personBId: personAId,
+        personAId: personDId,
+        personBId: personBId,
         type: "PARENT",
       });
 

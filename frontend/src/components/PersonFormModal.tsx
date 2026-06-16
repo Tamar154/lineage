@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { PersonFormData } from "../types/PersonFormData";
 import styles from "../styles/PersonFormModal.module.css";
+import { toDateInputValue } from "../utils/dateInput";
 
 type Props = {
   mode: "create" | "edit";
@@ -19,11 +20,17 @@ const emptyForm: PersonFormData = {
   biography: "",
 };
 
+const normalizeFormData = (data?: PersonFormData): PersonFormData => ({
+  ...emptyForm,
+  ...data,
+  birthDate: toDateInputValue(data?.birthDate),
+  deathDate: toDateInputValue(data?.deathDate),
+});
+
 const PersonFormModal = ({ mode, initialData, onClose, onSubmit }: Props) => {
-  const [formData, setFormData] = useState<PersonFormData>({
-    ...emptyForm,
-    ...initialData,
-  });
+  const [formData, setFormData] = useState<PersonFormData>(() =>
+    normalizeFormData(initialData),
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (

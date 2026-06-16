@@ -16,6 +16,7 @@ import PersonFormModal from "../components/PersonFormModal";
 import AddRelationshipModal from "../components/AddRelationshipModal";
 import type { PersonFormData } from "../types/PersonFormData";
 import styles from "../styles/TreePage.module.css";
+import { toDateInputValue } from "../utils/dateInput";
 import { getPersonDisplayName } from "../utils/personName";
 
 const TreePage = () => {
@@ -172,6 +173,7 @@ const TreePage = () => {
       </div>
       {showCreatePersonModal && (
         <PersonFormModal
+          key="create-person"
           mode="create"
           onClose={() => setShowCreatePersonModal(false)}
           onSubmit={handleCreatePerson}
@@ -180,13 +182,14 @@ const TreePage = () => {
 
       {showEditPersonModal && selectedPerson && (
         <PersonFormModal
+          key={`edit-person-${selectedPerson.id}`}
           mode="edit"
           initialData={{
             firstName: selectedPerson.firstName,
             lastName: selectedPerson.lastName ?? "",
             gender: selectedPerson.gender ?? "",
-            birthDate: selectedPerson.birthDate || "",
-            deathDate: selectedPerson.deathDate || "",
+            birthDate: toDateInputValue(selectedPerson.birthDate),
+            deathDate: toDateInputValue(selectedPerson.deathDate),
             birthPlace: selectedPerson.birthPlace ?? "",
             biography: selectedPerson.biography ?? "",
           }}

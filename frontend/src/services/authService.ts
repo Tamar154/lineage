@@ -1,4 +1,4 @@
-import api from "../api/axios";
+import { authClient } from "../auth/authClient";
 
 type RegisterData = {
   email: string;
@@ -11,12 +11,61 @@ type LoginData = {
   password: string;
 };
 
+const throwAuthError = (message?: string) => {
+  throw new Error(message || "Authentication failed");
+};
+
+const getFrontendOrigin = () =>
+  import.meta.env.VITE_FRONTEND_URL?.replace(/\/$/, "") ||
+  (typeof window !== "undefined"
+    ? window.location.origin
+    : "http://localhost:5173");
+
+const getFrontendUrl = (path: string) =>
+  `${getFrontendOrigin()}${path.startsWith("/") ? path : `/${path}`}`;
+
 export const register = async (data: RegisterData) => {
-  const response = await api.post("/auth/register", data);
-  return response.data;
+  const { data: result, error } = await authClient.signUp.email(data);
+
+  if (error) {
+    throwAuthError(error.message);
+  }
+
+  return result;
 };
 
 export const login = async (data: LoginData) => {
-  const reponse = await api.post("auth/login", data);
-  return reponse.data;
+  const { data: result, error } = await authClient.signIn.email(data);
+
+  if (error) {
+    throwAuthError(error.message);
+  }
+
+  return result;
 };
+
+export const loginWithGoogle = async () => {
+  const { data, error } = await authClient.signIn.social({
+    provider: "google",
+    callbackURL: getFrontendUrl("/trees"),
+    errorCallbackURL: getFrontendUrl("/login"),
+  });
+
+  if (error) {
+    throwAuthError(error.message);
+  }
+
+  return data;
+};
+
+export const logout = async () => {
+  const { error } = await authClient.signOut();
+
+  if (error) {
+    throwAuthError(error.message);
+  }
+};
+
+export const getSession = () => authClient.getSession();
+
+export const useSession = authClient.useSession;

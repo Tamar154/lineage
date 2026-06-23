@@ -1,6 +1,8 @@
 import type React from "react";
 import AppLogo from "./AppLogo";
 import { MdOutlineLogout } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../services/authService";
 import styles from "../styles/TreesLayout.module.css";
 
 type Props = {
@@ -8,7 +10,12 @@ type Props = {
 };
 
 const TreesLayout = (props: Props) => {
-  const handleLogout = async () => {};
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   return (
     <div className={styles.wrapper}>

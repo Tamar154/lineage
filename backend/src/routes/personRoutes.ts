@@ -7,7 +7,7 @@ import {
   updatePerson,
 } from "../controllers/personController.js";
 import { validateOwner } from "../middleware/validateOwner.js";
-import { verifyToken } from "../middleware/verifyToken.js";
+import { requireAuth } from "../auth/requireAuth.js";
 import { parseParams, validateBody } from "../middleware/zodValidation.js";
 import {
   createPersonSchema,
@@ -16,7 +16,7 @@ import {
 
 const router = express.Router({ mergeParams: true });
 
-router.use(verifyToken);
+router.use(requireAuth);
 router.use(validateOwner); // All routes require ownership validation
 
 router.post("/", validateBody(createPersonSchema), createPerson);

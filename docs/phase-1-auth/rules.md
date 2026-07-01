@@ -2,9 +2,9 @@ Read the following project planning documents first:
 
 - `docs/PRD.md`
 - `docs/API.md`
-- `docs/phase-1-auth-refactor.md`
-- `docs/phase-1-auth-testing.md`
-- `docs/phase-1-auth-checklist.md`
+- `docs/phase-1-auth/phase-1-auth-refactor.md`
+- `docs/phase-1-auth/phase-1-auth-testing.md`
+- `docs/phase-1-auth/phase-1-auth-checklist.md`
 
 Your source of truth is the V1 plan in these docs. The current implementation is a learning prototype and should only be used to understand what currently exists.
 

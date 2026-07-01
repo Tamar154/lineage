@@ -6,7 +6,7 @@ import {
   updateRelationship,
   deleteRelationship,
 } from "../controllers/relationshipController.js";
-import { verifyToken } from "../middleware/verifyToken.js";
+import { requireAuth } from "../auth/requireAuth.js";
 import { validateOwner } from "../middleware/validateOwner.js";
 import { parseParams, validateBody } from "../middleware/zodValidation.js";
 import {
@@ -16,7 +16,7 @@ import {
 
 const router = express.Router({ mergeParams: true });
 
-router.use(verifyToken);
+router.use(requireAuth);
 router.use(validateOwner); // All routes require ownership validation
 
 router.post("/", validateBody(createRelSchema), createRelationship);

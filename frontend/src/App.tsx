@@ -4,6 +4,7 @@ import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import TreesPage from "./pages/TreesPage";
 import TreePage from "./pages/TreePage";
+import ProtectedRoute from "./auth/ProtectedRoute";
 
 function App() {
   return (
@@ -11,8 +12,22 @@ function App() {
       <Routes>
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/trees" element={<TreesPage />} />
-        <Route path="/trees/:treeId" element={<TreePage />} />
+        <Route
+          path="/trees"
+          element={
+            <ProtectedRoute>
+              <TreesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trees/:treeId"
+          element={
+            <ProtectedRoute>
+              <TreePage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

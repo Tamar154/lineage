@@ -9,6 +9,9 @@ beforeAll(async () => {
   await prisma.relationship.deleteMany();
   await prisma.person.deleteMany();
   await prisma.tree.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.verification.deleteMany();
   await prisma.user.deleteMany();
 });
 

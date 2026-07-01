@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken } from "../middleware/verifyToken.js";
+import { requireAuth } from "../auth/requireAuth.js";
 import {
   getTrees,
   createTree,
@@ -15,7 +15,7 @@ import {
 
 const router = express.Router();
 
-router.use(verifyToken);
+router.use(requireAuth);
 
 router.get("/", getTrees);
 router.post("/", validateBody(createTreeSchema), createTree);

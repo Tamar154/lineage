@@ -18,8 +18,8 @@ const RegisterPage = () => {
     try {
       await register({ name, email, password });
       navigate("/trees");
-    } catch (error: any) {
-      setError(error.response.data.message || "Something went wrong");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 
@@ -56,9 +56,10 @@ const RegisterPage = () => {
           type="password"
           id="password"
           value={password}
-          placeholder="At least 6 characters"
-          autoComplete="password"
+          placeholder="At least 8 characters"
+          autoComplete="new-password"
           required={true}
+          minLength={8}
           onChange={(e) => setPassword(e.target.value)}
         />
 

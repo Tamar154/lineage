@@ -3,6 +3,8 @@ export type TreeResponse = {
   data: {
     id: string;
     name: string;
+    normalizedName: string;
+    description: string | null;
     createdAt: Date;
     updatedAt: Date;
   };

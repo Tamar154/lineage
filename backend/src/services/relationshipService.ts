@@ -1,6 +1,7 @@
 import AppError from "../utils/AppError.js";
 import { prisma } from "../config/db.js";
 import { RelationshipType } from "../generated/prisma/index.js";
+import { normalizeRelationship } from "./normalizeRelationship.js";
 
 /**
  * Validates that a proposed relationship between two persons is valid within the context of a tree.
@@ -13,7 +14,7 @@ import { RelationshipType } from "../generated/prisma/index.js";
  *
  * @param personAId - The ID of the first person in the relationship.
  * @param personBId - The ID of the second person in the relationship.
- * @param type - The type of relationship (e.g., PARENT, SPOUSE).
+ * @param type - The type of relationship (PARENT_CHILD or SPOUSE).
  * @param treeId - The ID of the tree to which both persons belong.
  * @throws {AppError} If the relationship is invalid for any reason.
  */
@@ -58,11 +59,11 @@ export async function validateRelationship(
     throw new AppError("This relationship already exists", 400);
   }
 
-  if (type === RelationshipType.PARENT) {
+  if (type === RelationshipType.PARENT_CHILD) {
     const circular = await prisma.relationship.findFirst({
       where: {
         treeId,
-        type: RelationshipType.PARENT,
+        type: RelationshipType.PARENT_CHILD,
         personAId: personBId,
         personBId: personAId,
         ...(currentRelId && { NOT: { id: currentRelId } }),
@@ -75,5 +76,47 @@ export async function validateRelationship(
         400,
       );
     }
+  }
+}
+
+type RelationshipWrite = {
+  treeId: string;
+  personAId: string;
+  personBId: string;
+  type: RelationshipType;
+};
+
+export async function createRelationshipRecord(input: RelationshipWrite) {
+  const normalized = normalizeRelationship(
+    input.personAId,
+    input.personBId,
+    input.type,
+  );
+
+  await validateRelationship(
+    normalized.personAId,
+    normalized.personBId,
+    input.type,
+    input.treeId,
+  );
+
+  try {
+    return await prisma.relationship.create({
+      data: {
+        treeId: input.treeId,
+        ...normalized,
+        type: input.type,
+      },
+    });
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      throw new AppError("This relationship already exists", 400);
+    }
+    throw error;
   }
 }

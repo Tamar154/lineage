@@ -13,7 +13,10 @@ const SearchPerson = ({ persons, selectedPersonIds, onSelect }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredPersons = persons.filter((person) => {
-    const fullName = `${person.firstName} ${person.lastName}`.toLowerCase();
+    const fullName = [person.firstName, person.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
     return fullName.includes(searchQuery.toLowerCase());
   });
 
@@ -39,8 +42,12 @@ const SearchPerson = ({ persons, selectedPersonIds, onSelect }: Props) => {
               key={person.id}
               onClick={() => onSelect?.(person)}
             >
-              <Avatar name={`${person.firstName} ${person.lastName}`} />
-              {person.firstName} {person.lastName}
+              <Avatar
+                name={[person.firstName, person.lastName]
+                  .filter(Boolean)
+                  .join(" ")}
+              />
+              {[person.firstName, person.lastName].filter(Boolean).join(" ")}
             </div>
           );
         })}

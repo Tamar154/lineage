@@ -16,10 +16,9 @@ const PersonDetailsPanel = ({
   onRemovePerson,
   onAddRelationship,
 }: Props) => {
-  const formatDate = (date?: string) => {
+  const formatDate = (date: string | null) => {
     if (!date) return "Unknown";
-
-    return new Date(date).toLocaleDateString();
+    return date;
   };
 
   return (
@@ -37,7 +36,7 @@ const PersonDetailsPanel = ({
 
       <div className={styles.mainInfo}>
         <h2 className={styles.name}>
-          {person.firstName} {person.lastName}
+          {[person.firstName, person.lastName].filter(Boolean).join(" ")}
         </h2>
         <p className={styles.dates}>
           {formatDate(person.birthDate)} - {formatDate(person.deathDate)}
@@ -46,7 +45,9 @@ const PersonDetailsPanel = ({
 
       <div className={styles.section}>
         <h4 className={styles.sectionTitle}>Biography</h4>
-        <p className={styles.bio}>{person.bio || "No biography yet."}</p>
+        <p className={styles.bio}>
+          {person.biography || "No biography yet."}
+        </p>
       </div>
 
       <div className={styles.actions}>

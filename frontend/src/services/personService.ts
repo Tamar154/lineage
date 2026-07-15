@@ -3,18 +3,24 @@ import api from "../api/axios";
 export type Person = {
   id: string;
   firstName: string;
-  lastName: string;
-  birthDate?: string;
-  deathDate?: string;
-  bio?: string;
+  lastName: string | null;
+  gender: "MALE" | "FEMALE" | "OTHER" | "UNKNOWN";
+  birthDate: string | null;
+  birthDatePrecision: "YEAR" | "MONTH" | "DAY" | null;
+  deathDate: string | null;
+  deathDatePrecision: "YEAR" | "MONTH" | "DAY" | null;
+  birthPlace: string | null;
+  biography: string | null;
 };
 
 type PersonFormData = {
   firstName: string;
-  lastName: string;
-  birthDate?: string;
-  deathDate?: string;
-  bio?: string;
+  lastName: string | null;
+  birthDate: string | null;
+  birthDatePrecision: "YEAR" | "MONTH" | "DAY" | null;
+  deathDate: string | null;
+  deathDatePrecision: "YEAR" | "MONTH" | "DAY" | null;
+  biography: string | null;
 };
 
 type TreeIdParams = {

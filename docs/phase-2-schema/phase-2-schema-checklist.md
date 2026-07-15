@@ -8,41 +8,41 @@ The goal is to establish the agreed V1 persistence model without mixing in later
 
 ## 1. Preparation
 
-- [ ] Read `docs/PRD.md`.
-- [ ] Read `docs/API.md`.
-- [ ] Read all files under `docs/phase-2-schema/`.
-- [ ] Confirm database reset is still acceptable.
-- [ ] Confirm no production data must be preserved.
-- [ ] Do not start unrelated API/UI/sharing work.
+- [x] Read `docs/PRD.md`.
+- [x] Read `docs/API.md`.
+- [x] Read all files under `docs/phase-2-schema/`.
+- [x] Confirm database reset is still acceptable.
+- [x] Confirm no production data must be preserved.
+- [x] Do not start unrelated API/UI/sharing work.
 
 ---
 
 ## 2. Confirmed Naming Decisions
 
-- [ ] Use `birthDate`.
-- [ ] Use `birthDatePrecision`.
-- [ ] Use `deathDate`.
-- [ ] Use `deathDatePrecision`.
-- [ ] Keep `personAId` and `personBId`.
-- [ ] Keep Prisma relations `personA` and `personB`.
-- [ ] Rename `PARENT` to `PARENT_CHILD`.
-- [ ] Document `PARENT_CHILD`: A = parent, B = child.
-- [ ] Document `SPOUSE`: A/B has no domain meaning and is normalized.
+- [x] Use `birthDate`.
+- [x] Use `birthDatePrecision`.
+- [x] Use `deathDate`.
+- [x] Use `deathDatePrecision`.
+- [x] Keep `personAId` and `personBId`.
+- [x] Keep Prisma relations `personA` and `personB`.
+- [x] Rename `PARENT` to `PARENT_CHILD`.
+- [x] Document `PARENT_CHILD`: A = parent, B = child.
+- [x] Document `SPOUSE`: A/B has no domain meaning and is normalized.
 
 ---
 
 ## 3. Prisma Tree Schema
 
-- [ ] Keep `id`.
-- [ ] Keep `ownerId String`.
-- [ ] Keep `name`.
-- [ ] Add `normalizedName String`.
-- [ ] Add `description String?`.
-- [ ] Keep timestamps.
-- [ ] Add `@@unique([ownerId, normalizedName])`.
-- [ ] Keep `@@index([ownerId])`.
-- [ ] Do not add a Prisma relation from Tree to Better Auth User.
-- [ ] Confirm a tree may contain zero people.
+- [x] Keep `id`.
+- [x] Keep `ownerId String`.
+- [x] Keep `name`.
+- [x] Add `normalizedName String`.
+- [x] Add `description String?`.
+- [x] Keep timestamps.
+- [x] Add `@@unique([ownerId, normalizedName])`.
+- [x] Keep `@@index([ownerId])`.
+- [x] Do not add a Prisma relation from Tree to Better Auth User.
+- [x] Confirm a tree may contain zero people.
 
 Target:
 
@@ -69,20 +69,20 @@ model Tree {
 
 ## 4. Prisma Person Schema
 
-- [ ] Keep `id`.
-- [ ] Keep `treeId` relation with cascade delete.
-- [ ] Keep `firstName String`.
-- [ ] Change `lastName` to `String?`.
-- [ ] Add `gender Gender @default(UNKNOWN)`.
-- [ ] Replace `birthDate DateTime?` with `birthDate String?`.
-- [ ] Add `birthDatePrecision DatePrecision?`.
-- [ ] Replace `deathDate DateTime?` with `deathDate String?`.
-- [ ] Add `deathDatePrecision DatePrecision?`.
-- [ ] Add `birthPlace String?`.
-- [ ] Rename `bio` to `biography String?`.
-- [ ] Keep timestamps.
-- [ ] Keep relationship arrays using `"A"` and `"B"`.
-- [ ] Keep `@@index([treeId])`.
+- [x] Keep `id`.
+- [x] Keep `treeId` relation with cascade delete.
+- [x] Keep `firstName String`.
+- [x] Change `lastName` to `String?`.
+- [x] Add `gender Gender @default(UNKNOWN)`.
+- [x] Replace `birthDate DateTime?` with `birthDate String?`.
+- [x] Add `birthDatePrecision DatePrecision?`.
+- [x] Replace `deathDate DateTime?` with `deathDate String?`.
+- [x] Add `deathDatePrecision DatePrecision?`.
+- [x] Add `birthPlace String?`.
+- [x] Rename `bio` to `biography String?`.
+- [x] Keep timestamps.
+- [x] Keep relationship arrays using `"A"` and `"B"`.
+- [x] Keep `@@index([treeId])`.
 
 Target:
 
@@ -119,18 +119,18 @@ model Person {
 
 ## 5. Prisma Relationship Schema
 
-- [ ] Keep `id`.
-- [ ] Keep `treeId` relation with cascade delete.
-- [ ] Keep `personAId`.
-- [ ] Keep `personBId`.
-- [ ] Keep `personA` relation `"A"`.
-- [ ] Keep `personB` relation `"B"`.
-- [ ] Change enum value `PARENT` to `PARENT_CHILD`.
-- [ ] Add `createdAt`.
-- [ ] Add `updatedAt`.
-- [ ] Keep exact ordered unique constraint.
-- [ ] Keep indexes.
-- [ ] Do not add a second direct relationship-creation path.
+- [x] Keep `id`.
+- [x] Keep `treeId` relation with cascade delete.
+- [x] Keep `personAId`.
+- [x] Keep `personBId`.
+- [x] Keep `personA` relation `"A"`.
+- [x] Keep `personB` relation `"B"`.
+- [x] Change enum value `PARENT` to `PARENT_CHILD`.
+- [x] Add `createdAt`.
+- [x] Add `updatedAt`.
+- [x] Keep exact ordered unique constraint.
+- [x] Keep indexes.
+- [x] Do not add a second direct relationship-creation path.
 
 Target:
 
@@ -163,9 +163,9 @@ model Relationship {
 
 ## 6. Prisma Enums
 
-- [ ] Add `Gender`.
-- [ ] Add `DatePrecision`.
-- [ ] Update `RelationshipType`.
+- [x] Add `Gender`.
+- [x] Add `DatePrecision`.
+- [x] Update `RelationshipType`.
 
 ```prisma
 enum Gender {
@@ -191,173 +191,178 @@ enum RelationshipType {
 
 ## 7. Migration and Prisma Client
 
-- [ ] Create a destructive pre-production migration/reset.
-- [ ] Document that no production-data migration is included.
-- [ ] Confirm Better Auth tables remain unchanged.
-- [ ] Run Prisma schema validation.
-- [ ] Apply/reset the development database.
-- [ ] Apply/reset the test database.
-- [ ] Generate Prisma client.
-- [ ] Do not manually edit generated client files.
-- [ ] Confirm backend imports still use the custom generated Prisma path.
+- [x] Create a destructive pre-production migration/reset.
+- [x] Document that no production-data migration is included.
+- [x] Confirm Better Auth tables remain unchanged.
+- [x] Run Prisma schema validation.
+- [x] Apply/reset the development database.
+
+Migration verification note (2026-07-14): the development database reports all three checked-in migrations applied and the schema up to date. The dedicated test database was successfully force-reset to the checked-in Prisma schema.
+
+- [x] Apply/reset the test database.
+- [x] Generate Prisma client.
+- [x] Do not manually edit generated client files.
+- [x] Confirm backend imports still use the custom generated Prisma path.
 
 ---
 
 ## 8. Tree Domain Logic
 
-- [ ] Add one reusable tree-name normalization function.
-- [ ] Trim display name.
-- [ ] Collapse repeated internal whitespace.
-- [ ] Lowercase normalized name.
-- [ ] Do not accept `normalizedName` from client.
-- [ ] Do not accept `ownerId` from client.
-- [ ] Set `ownerId` from Better Auth session.
-- [ ] Enforce name required.
-- [ ] Enforce name maximum 100.
-- [ ] Normalize description.
-- [ ] Store empty description as `null`.
-- [ ] Enforce description maximum 500.
-- [ ] Handle per-owner unique constraint.
-- [ ] Allow different owners to use the same normalized name.
+- [x] Add one reusable tree-name normalization function.
+- [x] Trim display name.
+- [x] Collapse repeated internal whitespace.
+- [x] Lowercase normalized name.
+- [x] Do not accept `normalizedName` from client.
+- [x] Do not accept `ownerId` from client.
+- [x] Set `ownerId` from Better Auth session.
+- [x] Enforce name required.
+- [x] Enforce name maximum 100.
+- [x] Normalize description.
+- [x] Store empty description as `null`.
+- [x] Enforce description maximum 500.
+- [x] Handle per-owner unique constraint.
+- [x] Allow different owners to use the same normalized name.
 
 ---
 
 ## 9. Person Domain Logic
 
-- [ ] Enforce required `firstName`.
-- [ ] Trim `firstName`.
-- [ ] Enforce first name maximum 100.
-- [ ] Make `lastName` optional.
-- [ ] Store empty last name as `null`.
-- [ ] Enforce last name maximum 100.
-- [ ] Default omitted gender to `UNKNOWN`.
-- [ ] Validate gender enum.
-- [ ] Add optional birth place.
-- [ ] Store empty birth place as `null`.
-- [ ] Enforce birth place maximum 150.
-- [ ] Add optional biography.
-- [ ] Store empty biography as `null`.
-- [ ] Enforce biography maximum 2000.
-- [ ] Continue allowing duplicate people.
+- [x] Enforce required `firstName`.
+- [x] Trim `firstName`.
+- [x] Enforce first name maximum 100.
+- [x] Make `lastName` optional.
+- [x] Store empty last name as `null`.
+- [x] Enforce last name maximum 100.
+- [x] Default omitted gender to `UNKNOWN`.
+- [x] Validate gender enum.
+- [x] Add optional birth place.
+- [x] Store empty birth place as `null`.
+- [x] Enforce birth place maximum 150.
+- [x] Add optional biography.
+- [x] Store empty biography as `null`.
+- [x] Enforce biography maximum 2000.
+- [x] Continue allowing duplicate people.
 
 ---
 
 ## 10. Partial-Date Domain Logic
 
-- [ ] Add focused partial-date utility/module.
-- [ ] Support `YEAR` format `YYYY`.
-- [ ] Support `MONTH` format `YYYY-MM`.
-- [ ] Support `DAY` format `YYYY-MM-DD`.
-- [ ] Require date and precision together.
-- [ ] Validate real month values.
-- [ ] Validate real calendar days.
-- [ ] Handle leap years.
-- [ ] Reject future dates.
-- [ ] Convert partial dates to ranges for comparison.
-- [ ] Reject conclusively invalid death-before-birth.
-- [ ] Allow overlapping uncertain ranges.
-- [ ] Do not persist invented month/day values.
-- [ ] Support clearing date and precision together.
-- [ ] Prevent partial updates from leaving an invalid half-pair.
+- [x] Add focused partial-date utility/module.
+- [x] Support `YEAR` format `YYYY`.
+- [x] Support `MONTH` format `YYYY-MM`.
+- [x] Support `DAY` format `YYYY-MM-DD`.
+- [x] Require date and precision together.
+- [x] Validate real month values.
+- [x] Validate real calendar days.
+- [x] Handle leap years.
+- [x] Reject future dates.
+- [x] Convert partial dates to ranges for comparison.
+- [x] Reject conclusively invalid death-before-birth.
+- [x] Allow overlapping uncertain ranges.
+- [x] Do not persist invented month/day values.
+- [x] Support clearing date and precision together.
+- [x] Prevent partial updates from leaving an invalid half-pair.
 
 ---
 
 ## 11. Relationship Domain Logic
 
-- [ ] Route all relationship creation through relationship service.
-- [ ] Validate authenticated tree ownership.
-- [ ] Validate both people exist.
-- [ ] Validate both people belong to route tree.
-- [ ] Reject self-relationship.
-- [ ] For `PARENT_CHILD`, keep A=parent and B=child.
-- [ ] Do not sort `PARENT_CHILD` IDs.
-- [ ] For `SPOUSE`, normalize A/B pair to stable order.
-- [ ] Check duplicate after spouse normalization.
-- [ ] Reject exact duplicate `PARENT_CHILD`.
-- [ ] Preserve delete-relationship behavior.
-- [ ] Confirm deleting a relationship leaves people.
-- [ ] Confirm deleting a person cascades A-side relationships.
-- [ ] Confirm deleting a person cascades B-side relationships.
-- [ ] Do not turn this phase into the complete relationship-rule rewrite.
+- [x] Route all relationship creation through relationship service.
+- [x] Validate authenticated tree ownership.
+- [x] Validate both people exist.
+- [x] Validate both people belong to route tree.
+- [x] Reject self-relationship.
+- [x] For `PARENT_CHILD`, keep A=parent and B=child.
+- [x] Do not sort `PARENT_CHILD` IDs.
+- [x] For `SPOUSE`, normalize A/B pair to stable order.
+- [x] Check duplicate after spouse normalization.
+- [x] Reject exact duplicate `PARENT_CHILD`.
+- [x] Preserve delete-relationship behavior.
+- [x] Confirm deleting a relationship leaves people.
+- [x] Confirm deleting a person cascades A-side relationships.
+- [x] Confirm deleting a person cascades B-side relationships.
+- [x] Do not turn this phase into the complete relationship-rule rewrite.
 
 ---
 
 ## 12. Backend Types, Validators, and Controllers
 
-- [ ] Update tree input/output types.
-- [ ] Update person input/output types.
-- [ ] Update relationship input/output types.
-- [ ] Update tree validator.
-- [ ] Update person validator.
-- [ ] Update relationship validator.
-- [ ] Update tree controller/service.
-- [ ] Update person controller/service.
-- [ ] Update relationship controller/service.
-- [ ] Update graph controller/response.
-- [ ] Remove assumptions that last name is required.
-- [ ] Remove assumptions that dates are `DateTime`.
-- [ ] Remove assumptions that type is `PARENT`.
-- [ ] Keep current route paths.
-- [ ] Keep current error style for now.
+- [x] Update tree input/output types.
+- [x] Update person input/output types.
+- [x] Update relationship input/output types.
+- [x] Update tree validator.
+- [x] Update person validator.
+- [x] Update relationship validator.
+- [x] Update tree controller/service.
+- [x] Update person controller/service.
+- [x] Update relationship controller/service.
+- [x] Update graph controller/response.
+- [x] Remove assumptions that last name is required.
+- [x] Remove assumptions that dates are `DateTime`.
+- [x] Remove assumptions that type is `PARENT`.
+- [x] Keep current route paths.
+- [x] Keep current error style for now.
 
 ---
 
 ## 13. Security and Ownership
 
-- [ ] Every private route still uses `requireAuth`.
-- [ ] Every nested route validates tree ownership.
-- [ ] No request may override `ownerId`.
-- [ ] No request may override `normalizedName`.
-- [ ] Person IDs are checked against route tree.
-- [ ] Relationship person IDs are checked against route tree.
-- [ ] Cross-tree relationships are rejected.
-- [ ] Cross-owner access is rejected.
-- [ ] Better Auth Account/Session/Verification data is not exposed.
-- [ ] Better Auth schema is not changed.
-- [ ] Ownership regression tests pass.
+- [x] Every private route still uses `requireAuth`.
+- [x] Every nested route validates tree ownership.
+- [x] No request may override `ownerId`.
+- [x] No request may override `normalizedName`.
+- [x] Person IDs are checked against route tree.
+- [x] Relationship person IDs are checked against route tree.
+- [x] Cross-tree relationships are rejected.
+- [x] Cross-owner access is rejected.
+- [x] Better Auth Account/Session/Verification data is not exposed.
+- [x] Better Auth schema is not changed.
+- [x] Ownership regression tests pass.
 
 ---
 
 ## 14. Tests
 
-- [ ] Add tree normalization unit tests.
-- [ ] Add optional-string normalization tests.
-- [ ] Add partial-date shape tests.
-- [ ] Add partial-date range tests.
-- [ ] Add birth/death comparison tests.
-- [ ] Add spouse normalization tests.
-- [ ] Update tree integration tests.
-- [ ] Update person integration tests.
-- [ ] Update relationship integration tests.
-- [ ] Update graph tests if present.
-- [ ] Keep auth tests passing.
-- [ ] Test same-owner normalized duplicate rejection.
-- [ ] Test different-owner same-name acceptance.
-- [ ] Test person without last name.
-- [ ] Test gender default.
-- [ ] Test empty optional strings become `null`.
-- [ ] Test parent-child A/B direction.
-- [ ] Test spouse reverse duplicate rejection.
-- [ ] Test cross-tree relationship rejection.
-- [ ] Test person cascade deletes relationships.
-- [ ] Document unrelated pre-existing failing tests.
+- [x] Add tree normalization unit tests.
+- [x] Add optional-string normalization tests.
+- [x] Add partial-date shape tests.
+- [x] Add partial-date range tests.
+- [x] Add birth/death comparison tests.
+- [x] Add spouse normalization tests.
+- [x] Update tree integration tests.
+- [x] Update person integration tests.
+- [x] Update relationship integration tests.
+- [x] Update graph tests if present.
+- [x] Keep auth tests passing.
+- [x] Test same-owner normalized duplicate rejection.
+- [x] Test different-owner same-name acceptance.
+- [x] Test person without last name.
+- [x] Test gender default.
+- [x] Test empty optional strings become `null`.
+- [x] Test parent-child A/B direction.
+- [x] Test spouse reverse duplicate rejection.
+- [x] Test cross-tree relationship rejection.
+- [x] Test person cascade deletes relationships.
+- [x] Document unrelated pre-existing failing tests.
+
+Verification note (2026-07-14): all 52 backend tests pass. Repository-wide backend lint still has pre-existing unsafe-`any` findings in Supertest tests and middleware typing; lint is not part of the Phase 2 completion gate.
 
 ---
 
 ## 15. Frontend Compatibility
 
-- [ ] Update frontend types as required.
-- [ ] Handle optional `lastName`.
-- [ ] Avoid displaying `null` or `undefined` in names.
-- [ ] Update `bio` usage to `biography`.
-- [ ] Update date field assumptions.
-- [ ] Update `PARENT` usage to `PARENT_CHILD`.
-- [ ] Keep `personAId` and `personBId`.
-- [ ] Preserve parent-child direction in graph transformation.
-- [ ] Preserve spouse handling.
-- [ ] Keep current routes.
-- [ ] Keep current UI design.
-- [ ] Confirm frontend TypeScript/build passes.
+- [x] Update frontend types as required.
+- [x] Handle optional `lastName`.
+- [x] Avoid displaying `null` or `undefined` in names.
+- [x] Update `bio` usage to `biography`.
+- [x] Update date field assumptions.
+- [x] Update `PARENT` usage to `PARENT_CHILD`.
+- [x] Keep `personAId` and `personBId`.
+- [x] Preserve parent-child direction in graph transformation.
+- [x] Preserve spouse handling.
+- [x] Keep current routes.
+- [x] Keep current UI design.
+- [x] Confirm frontend TypeScript/build passes.
 
 ---
 
@@ -365,31 +370,33 @@ enum RelationshipType {
 
 Backend/API:
 
-- [ ] Start backend.
-- [ ] Prisma-backed routes respond.
-- [ ] Auth still works.
-- [ ] Create normalized tree.
-- [ ] Duplicate normalized tree name is rejected.
-- [ ] Create empty tree.
-- [ ] Create person with first name only.
-- [ ] Create person with partial date.
-- [ ] Update and clear optional person fields.
-- [ ] Create parent-child relationship.
-- [ ] Create spouse relationship.
-- [ ] Reverse spouse duplicate is rejected.
-- [ ] Delete relationship without deleting people.
-- [ ] Delete person and confirm connected relationships are removed.
+- [x] Start backend.
+- [x] Prisma-backed routes respond.
+- [x] Auth still works.
+- [x] Create normalized tree.
+- [x] Duplicate normalized tree name is rejected.
+- [x] Create empty tree.
+- [x] Create person with first name only.
+- [x] Create person with partial date.
+- [x] Update and clear optional person fields.
+- [x] Create parent-child relationship.
+- [x] Create spouse relationship.
+- [x] Reverse spouse duplicate is rejected.
+- [x] Delete relationship without deleting people.
+- [x] Delete person and confirm connected relationships are removed.
+
+Backend/API smoke note (2026-07-14): verified against a running backend using the dedicated test database. The smoke records were cleaned up after verification.
 
 Frontend/browser:
 
-- [ ] Register/login flow still works in browser.
-- [ ] Tree dashboard loads.
-- [ ] Empty tree opens.
-- [ ] Person without last name renders correctly.
-- [ ] Parent-child relationship renders correctly.
-- [ ] Spouse relationship renders correctly.
-- [ ] Current graph pan/zoom/select still works.
-- [ ] Logout still works.
+- [x] Register/login flow still works in browser.
+- [x] Tree dashboard loads.
+- [x] Empty tree opens.
+- [x] Person without last name renders correctly.
+- [x] Parent-child relationship renders correctly.
+- [x] Spouse relationship renders correctly.
+- [x] Current graph pan/zoom/select still works.
+- [x] Logout still works.
 
 Do not check browser items based solely on backend tests.
 
@@ -399,21 +406,21 @@ Do not check browser items based solely on backend tests.
 
 Before moving to Phase 3, confirm:
 
-- [ ] Target Tree schema is implemented.
-- [ ] Target Person schema is implemented.
-- [ ] Target Relationship schema is implemented.
-- [ ] `birthDate` and `deathDate` naming is used consistently.
-- [ ] `personA`/`personB` naming is used consistently.
-- [ ] A=parent/B=child is documented and tested.
-- [ ] Spouse normalization is documented and tested.
-- [ ] Better Auth remains working.
-- [ ] Ownership isolation remains working.
-- [ ] Prisma migration/reset succeeds.
-- [ ] Backend compiles.
-- [ ] Frontend builds.
-- [ ] Required tests pass.
-- [ ] Manual verification is recorded accurately.
-- [ ] No route renames were added.
-- [ ] No share-link work was added.
-- [ ] No final error-envelope work was added.
-- [ ] No full relationship-rule overhaul was added.
+- [x] Target Tree schema is implemented.
+- [x] Target Person schema is implemented.
+- [x] Target Relationship schema is implemented.
+- [x] `birthDate` and `deathDate` naming is used consistently.
+- [x] `personA`/`personB` naming is used consistently.
+- [x] A=parent/B=child is documented and tested.
+- [x] Spouse normalization is documented and tested.
+- [x] Better Auth remains working.
+- [x] Ownership isolation remains working.
+- [x] Prisma migration/reset succeeds.
+- [x] Backend compiles.
+- [x] Frontend builds.
+- [x] Required tests pass.
+- [x] Manual verification is recorded accurately.
+- [x] No route renames were added.
+- [x] No share-link work was added.
+- [x] No final error-envelope work was added.
+- [x] No full relationship-rule overhaul was added.

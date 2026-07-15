@@ -13,8 +13,10 @@ const emptyForm: PersonFormData = {
   firstName: "",
   lastName: "",
   birthDate: "",
+  birthDatePrecision: null,
   deathDate: "",
-  bio: "",
+  deathDatePrecision: null,
+  biography: "",
 };
 
 const PersonFormModal = ({ mode, initialData, onClose, onSubmit }: Props) => {
@@ -32,13 +34,19 @@ const PersonFormModal = ({ mode, initialData, onClose, onSubmit }: Props) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+      ...(name === "birthDate" && {
+        birthDatePrecision: value ? "DAY" : null,
+      }),
+      ...(name === "deathDate" && {
+        deathDatePrecision: value ? "DAY" : null,
+      }),
     }));
   };
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+    if (!formData.firstName.trim()) {
       return;
     }
 
@@ -47,10 +55,16 @@ const PersonFormModal = ({ mode, initialData, onClose, onSubmit }: Props) => {
 
       await onSubmit({
         firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        birthDate: formData.birthDate || undefined,
-        deathDate: formData.deathDate || undefined,
-        bio: formData.bio?.trim() || undefined,
+        lastName: formData.lastName?.trim() || null,
+        birthDate: formData.birthDate || null,
+        birthDatePrecision: formData.birthDate
+          ? formData.birthDatePrecision
+          : null,
+        deathDate: formData.deathDate || null,
+        deathDatePrecision: formData.deathDate
+          ? formData.deathDatePrecision
+          : null,
+        biography: formData.biography?.trim() || null,
       });
       onClose();
     } catch (error) {
@@ -86,9 +100,8 @@ const PersonFormModal = ({ mode, initialData, onClose, onSubmit }: Props) => {
             id="lastName"
             name="lastName"
             type="text"
-            value={formData.lastName}
+            value={formData.lastName ?? ""}
             onChange={handleChange}
-            required
           />
         </div>
 
@@ -98,7 +111,7 @@ const PersonFormModal = ({ mode, initialData, onClose, onSubmit }: Props) => {
             id="birthDate"
             name="birthDate"
             type="date"
-            value={formData.birthDate}
+            value={formData.birthDate ?? ""}
             onChange={handleChange}
           />
         </div>
@@ -109,18 +122,18 @@ const PersonFormModal = ({ mode, initialData, onClose, onSubmit }: Props) => {
             id="deathDate"
             name="deathDate"
             type="date"
-            value={formData.deathDate}
+            value={formData.deathDate ?? ""}
             onChange={handleChange}
           />
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="bio">Biography</label>
+          <label htmlFor="biography">Biography</label>
           <textarea
-            id="bio"
-            name="bio"
+            id="biography"
+            name="biography"
             rows={4}
-            value={formData.bio}
+            value={formData.biography ?? ""}
             onChange={handleChange}
           />
         </div>

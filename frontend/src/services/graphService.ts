@@ -1,19 +1,12 @@
 import api from "../api/axios";
 
-export type GraphPerson = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  birthDate?: string;
-  deathDate?: string;
-  bio?: string;
-};
+import type { Person as GraphPerson } from "./personService";
 
 export type Relationship = {
   id: string;
   personAId: string;
   personBId: string;
-  type: "PARENT" | "SPOUSE";
+  type: "PARENT_CHILD" | "SPOUSE";
 };
 
 export type GraphData = {

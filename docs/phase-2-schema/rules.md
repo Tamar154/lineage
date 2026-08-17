@@ -275,3 +275,5 @@ Verify:
 - no unrelated V1 feature is added
 
 If a product requirement is missing, do not infer it from prototype code. Document the missing decision and ask before implementing it.
+
+README impact assessment: If this phase changes setup, authentication, environment variables, architecture, user-visible features, routes/API usage, tech stack, or developer workflow, update README.md. Otherwise explicitly mark README update as not required.

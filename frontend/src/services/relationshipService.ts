@@ -14,8 +14,7 @@ export const createRelationship = async ({
   targetPersonId,
 }: CreateRelationshipParams) => {
   const res = await api.post(`/trees/${treeId}/relationships`, {
-    treeId,
-    type: type.toUpperCase(),
+    type: type === "parent" ? "PARENT_CHILD" : "SPOUSE",
     personAId: sourcePersonId,
     personBId: targetPersonId,
   });

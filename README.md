@@ -1,19 +1,20 @@
 # Lineage
 
-Lineage is a full-stack family tree application that lets users create private family trees, add people, define relationships, and view the tree as an interactive graph.
+Lineage is a full-stack family tree application that lets users create private family trees, add people, define relationships, and view each tree as an interactive graph.
 
 The project is split into a TypeScript/Express backend and a React/Vite frontend.
 
 ## Features
 
-- User registration and login
-- JWT-based authentication with an HTTP-only cookie
-- User-owned family trees
-- Create, view, and delete trees
+- Email/password and Google authentication through Better Auth
+- Session-based protected routes
+- Multiple private family trees per authenticated user
+- Create, view, update, and delete trees
 - Add, edit, view, and delete people inside a tree
-- Add parent-child and spouse relationships
-- Relationship validation to prevent invalid or duplicate connections
-- Interactive family tree graph visualization
+- Optional last names, gender, partial birth/death dates, birth place, and biography
+- Parent-child and spouse relationships
+- Relationship validation for self-links, duplicates, circular parent-child links, and the one-spouse-per-person rule
+- Automatic interactive family-tree visualization
 - PostgreSQL database access through Prisma
 - Backend tests with Vitest and Supertest
 
@@ -35,9 +36,9 @@ The project is split into a TypeScript/Express backend and a React/Vite frontend
 - Node.js
 - Express
 - TypeScript
+- Better Auth
 - Prisma
 - PostgreSQL / Neon
-- JWT authentication
 - Zod validation
 - Vitest
 - Supertest
@@ -47,39 +48,40 @@ The project is split into a TypeScript/Express backend and a React/Vite frontend
 
 ```txt
 lineage/
-├── backend/
-│   ├── prisma/
-│   │   ├── schema.prisma
-│   │   └── migrations/
-│   ├── src/
-│   │   ├── config/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── tests/
-│   │   ├── types/
-│   │   ├── utils/
-│   │   ├── validators/
-│   │   ├── app.ts
-│   │   └── server.ts
-│   ├── package.json
-│   └── vitest.config.ts
-│
-├── frontend/
-│   ├── src/
-│   │   ├── api/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── styles/
-│   │   ├── types/
-│   │   ├── utils/
-│   │   └── App.tsx
-│   └── package.json
-│
-├── README.md
-└── LICENSE
+|-- backend/
+|   |-- prisma/
+|   |   |-- schema.prisma
+|   |   `-- migrations/
+|   |-- src/
+|   |   |-- auth/
+|   |   |-- config/
+|   |   |-- controllers/
+|   |   |-- middleware/
+|   |   |-- routes/
+|   |   |-- services/
+|   |   |-- tests/
+|   |   |-- types/
+|   |   |-- utils/
+|   |   |-- validators/
+|   |   |-- app.ts
+|   |   `-- server.ts
+|   |-- package.json
+|   `-- vitest.config.ts
+|-- frontend/
+|   |-- src/
+|   |   |-- api/
+|   |   |-- auth/
+|   |   |-- components/
+|   |   |-- pages/
+|   |   |-- services/
+|   |   |-- styles/
+|   |   |-- types/
+|   |   |-- utils/
+|   |   `-- App.tsx
+|   `-- package.json
+|-- docs/
+|-- README.md
+`-- LICENSE
 ```
 
 ## Getting Started
@@ -92,7 +94,7 @@ Make sure you have the following installed:
 - npm
 - A PostgreSQL-compatible database
 
-The backend is configured to use Prisma with the Neon adapter, so a Neon database works well for local development.
+The backend uses Prisma with the Neon adapter, so a Neon database works well for local development.
 
 ## Installation
 
@@ -105,36 +107,40 @@ cd lineage
 
 ## Backend Setup
 
-Go into the backend directory:
+Go into the backend directory and install dependencies:
 
 ```bash
 cd backend
 npm install
 ```
 
-Create a `.env` file inside `backend/`:
+Copy `backend/.env.example` to `backend/.env` and provide your database and authentication credentials:
 
 ```env
-PORT=8000
+DATABASE_URL=
+TEST_DATABASE_URL=
+DIRECT_URL=
+TEST_DIRECT_URL=
 
-DATABASE_URL="your_database_url"
-DIRECT_URL="your_direct_database_url"
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=http://localhost:3000
+FRONTEND_ORIGIN=http://localhost:5173
 
-TEST_DATABASE_URL="your_test_database_url"
-TEST_DIRECT_URL="your_test_direct_database_url"
-
-JWT_SECRET="your_jwt_secret"
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 ```
 
-> Important: use a separate test database for `TEST_DATABASE_URL`. The test setup clears the database before running tests.
+Use separate application and direct connection URLs for your development and test databases. The test setup clears the test database, so never point the test variables at data you need to keep.
 
-Generate the Prisma client:
+````
+
+Generate the custom Prisma client in `backend/src/generated/prisma`:
 
 ```bash
 npx prisma generate
-```
+````
 
-Run database migrations:
+Apply migrations to the development database:
 
 ```bash
 npx prisma migrate dev
@@ -146,19 +152,26 @@ Start the backend server:
 npm run dev
 ```
 
-The backend should now be running at:
+The backend runs at:
 
 ```txt
-http://localhost:8000
+http://localhost:3000
 ```
 
 ## Frontend Setup
 
-Open a second terminal and go into the frontend directory:
+Open a second terminal, enter the frontend directory, and install dependencies:
 
 ```bash
 cd frontend
 npm install
+```
+
+Copy `frontend/.env.example` to `frontend/.env`:
+
+```env
+VITE_API_URL=http://localhost:3000
+VITE_FRONTEND_URL=http://localhost:5173
 ```
 
 Start the frontend development server:
@@ -167,17 +180,13 @@ Start the frontend development server:
 npm run dev
 ```
 
-The frontend should now be running at:
+The frontend runs at:
 
 ```txt
 http://localhost:5173
 ```
 
-By default, the frontend sends API requests to:
-
-```txt
-http://localhost:8000/api
-```
+By default, application API requests are sent to `http://localhost:3000/api`, and authentication requests are handled by Better Auth on the same backend.
 
 ## Available Scripts
 
@@ -188,6 +197,7 @@ Run these from the `backend/` directory.
 | Command              | Description                                            |
 | -------------------- | ------------------------------------------------------ |
 | `npm run dev`        | Start the backend in development mode                  |
+| `npm run build`      | Type-check and compile the backend                     |
 | `npm run test`       | Run backend tests once                                 |
 | `npm run test:watch` | Run backend tests in watch mode                        |
 | `npm run lint`       | Run ESLint                                             |
@@ -200,7 +210,7 @@ Run these from the `frontend/` directory.
 | Command           | Description                          |
 | ----------------- | ------------------------------------ |
 | `npm run dev`     | Start the Vite development server    |
-| `npm run build`   | Build the frontend for production    |
+| `npm run build`   | Type-check and build the frontend    |
 | `npm run lint`    | Run ESLint                           |
 | `npm run preview` | Preview the production build locally |
 
@@ -208,72 +218,59 @@ Run these from the `frontend/` directory.
 
 ### Backend
 
-| Variable            | Description                                                              |
-| ------------------- | ------------------------------------------------------------------------ |
-| `PORT`              | Backend server port. Use `8000` to match the frontend API configuration. |
-| `DATABASE_URL`      | Database connection URL used by the app.                                 |
-| `DIRECT_URL`        | Direct database URL used by Prisma commands.                             |
-| `TEST_DATABASE_URL` | Database connection URL used while running tests.                        |
-| `TEST_DIRECT_URL`   | Direct database URL used by Prisma commands in test mode.                |
-| `JWT_SECRET`        | Secret key used to sign JWT authentication tokens.                       |
+| Variable               | Description                                                             |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `DATABASE_URL`         | Application connection URL for the development database                 |
+| `TEST_DATABASE_URL`    | Application connection URL for the isolated test database               |
+| `DIRECT_URL`           | Direct development database URL used by Prisma CLI commands             |
+| `TEST_DIRECT_URL`      | Direct test database URL used by Prisma CLI commands in test mode       |
+| `BETTER_AUTH_SECRET`   | Private secret used by Better Auth                                      |
+| `BETTER_AUTH_URL`      | Backend origin used by Better Auth; defaults to `http://localhost:3000` |
+| `FRONTEND_ORIGIN`      | Trusted frontend/CORS origin; defaults to `http://localhost:5173`       |
+| `GOOGLE_CLIENT_ID`     | Google OAuth client ID                                                  |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret                                              |
+
+### Frontend
+
+| Variable            | Description                                                                            |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| `VITE_API_URL`      | Backend origin; defaults to `http://localhost:3000`                                    |
+| `VITE_FRONTEND_URL` | Frontend origin used for authentication callbacks; defaults to `http://localhost:5173` |
 
 ## API Overview
 
-Base URL:
+Application API base URL:
 
 ```txt
-http://localhost:8000/api
+http://localhost:3000/api
 ```
 
-Most routes are protected and require the user to be logged in. Authentication is handled through an HTTP-only `jwt` cookie.
+Tree, person, relationship, and graph routes require an authenticated Better Auth session. Requests from the frontend include credentials so the backend can validate the session.
 
 ### Authentication
 
-| Method | Endpoint         | Description              |
-| ------ | ---------------- | ------------------------ |
-| `POST` | `/auth/register` | Register a new user      |
-| `POST` | `/auth/login`    | Log in an existing user  |
-| `POST` | `/auth/logout`   | Log out the current user |
+Authentication is handled by Better Auth under `/api/auth/*`.
 
-#### Register
+The application supports:
 
-```http
-POST /api/auth/register
-```
+- Email/password signup and sign-in
+- Google sign-in
+- Sign-out
+- Session-based protected routes
 
-Request body:
-
-```json
-{
-  "email": "user@example.com",
-  "password": "password123",
-  "name": "User Name"
-}
-```
-
-#### Login
-
-```http
-POST /api/auth/login
-```
-
-Request body:
-
-```json
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
+Better Auth owns the authentication endpoints; application domain routes are documented below.
 
 ### Trees
 
 | Method   | Endpoint         | Description                                   |
 | -------- | ---------------- | --------------------------------------------- |
 | `GET`    | `/trees`         | Get all trees owned by the authenticated user |
-| `POST`   | `/trees`         | Create a new tree                             |
-| `GET`    | `/trees/:treeId` | Get a specific tree                           |
-| `DELETE` | `/trees/:treeId` | Delete a specific tree                        |
+| `POST`   | `/trees`         | Create a tree                                 |
+| `GET`    | `/trees/:treeId` | Get an owned tree                             |
+| `PATCH`  | `/trees/:treeId` | Update an owned tree                          |
+| `DELETE` | `/trees/:treeId` | Delete an owned tree                          |
+
+Tree names are trimmed and normalized for case-insensitive per-owner uniqueness. Descriptions are optional.
 
 #### Create Tree
 
@@ -281,11 +278,10 @@ Request body:
 POST /api/trees
 ```
 
-Request body:
-
 ```json
 {
-  "name": "My Family Tree"
+  "name": "My Family Tree",
+  "description": "An optional description"
 }
 ```
 
@@ -309,19 +305,23 @@ POST /api/trees/:treeId/persons
 PUT /api/trees/:treeId/persons/:id
 ```
 
-Request body:
+Example request body:
 
 ```json
 {
   "firstName": "Ada",
   "lastName": "Lovelace",
+  "gender": "FEMALE",
   "birthDate": "1815-12-10",
+  "birthDatePrecision": "DAY",
   "deathDate": "1852-11-27",
-  "bio": "English mathematician and writer."
+  "deathDatePrecision": "DAY",
+  "birthPlace": "London",
+  "biography": "English mathematician and writer."
 }
 ```
 
-`birthDate`, `deathDate`, and `bio` are optional.
+Only `firstName` is required. Gender defaults to `UNKNOWN`; supported values are `MALE`, `FEMALE`, `OTHER`, and `UNKNOWN`. Dates support `YEAR`, `MONTH`, and `DAY` precision, and each supplied date must include its matching precision.
 
 ### Relationships
 
@@ -343,22 +343,15 @@ POST /api/trees/:treeId/relationships
 PUT /api/trees/:treeId/relationships/:id
 ```
 
-Request body:
-
 ```json
 {
   "personAId": "person-id-1",
   "personBId": "person-id-2",
-  "type": "PARENT"
+  "type": "PARENT_CHILD"
 }
 ```
 
-Supported relationship types:
-
-```txt
-PARENT
-SPOUSE
-```
+Supported relationship types are `PARENT_CHILD` and `SPOUSE`. For `PARENT_CHILD`, person A is the parent and person B is the child. Spouse relationships are normalized before storage.
 
 ### Graph
 
@@ -366,58 +359,32 @@ SPOUSE
 | ------ | ---------------------- | ------------------------------------------------------------ |
 | `GET`  | `/trees/:treeId/graph` | Get graph-ready tree data including people and relationships |
 
-#### Graph Response Shape
-
-```json
-{
-  "status": "success",
-  "data": {
-    "id": "tree-id",
-    "name": "My Family Tree",
-    "persons": [
-      {
-        "id": "person-id",
-        "firstName": "Ada",
-        "lastName": "Lovelace",
-        "birthDate": "1815-12-10T00:00:00.000Z",
-        "deathDate": "1852-11-27T00:00:00.000Z",
-        "bio": "English mathematician and writer."
-      }
-    ],
-    "relationships": [
-      {
-        "id": "relationship-id",
-        "personAId": "person-id-1",
-        "personBId": "person-id-2",
-        "type": "PARENT"
-      }
-    ]
-  }
-}
-```
+The graph response contains the owned tree, its people with current person fields, and relationships using the same `PARENT_CHILD` and `SPOUSE` values described above. The frontend uses this response to generate the React Flow visualization automatically.
 
 ## Data Model
 
-The main database models are:
+The main domain models are:
 
-- `User` - owns one or more family trees
+- `User` - authenticated through Better Auth and owns one or more family trees
 - `Tree` - belongs to a user and contains people and relationships
 - `Person` - represents a person in a family tree
-- `Relationship` - connects two people in a tree
-- `RelationshipType` - supports `PARENT` and `SPOUSE`
+- `Relationship` - connects two people in a tree as `PARENT_CHILD` or `SPOUSE`
+
+Better Auth also persists its session and account data through Prisma.
 
 ## Validation and Authorization
 
 The backend validates request bodies and route parameters with Zod.
 
-Protected routes require a valid JWT cookie. Tree-specific routes also verify that the requested tree belongs to the authenticated user before returning or modifying data.
+Protected routes require a valid Better Auth session. Tree-specific routes verify that the requested tree belongs to the authenticated user before returning or modifying data.
 
-Relationship creation includes validation for cases such as:
+Current relationship validation includes:
 
 - A person cannot have a relationship with themselves
 - Both people must belong to the same tree
 - Duplicate relationships are not allowed
-- Circular parent-child relationships are not allowed
+- Direct circular parent-child relationships are not allowed
+- A person can have at most one spouse
 
 ## Testing
 
@@ -439,15 +406,17 @@ Run tests in watch mode:
 npm run test:watch
 ```
 
-Make sure your test environment variables point to a separate test database, because the test setup clears the database before running.
+Tests use Vitest and Supertest. Ensure the test environment variables point to a separate test database because the test setup clears that database before running.
 
 ## Notes for Development
 
-- The frontend expects the backend API to run on `http://localhost:8000/api`.
-- The backend allows CORS requests from `http://localhost:5173`.
-- Authentication depends on cookies, so API requests must include credentials.
-- The frontend uses React Flow and ELK.js to render and lay out the family tree graph.
+- The frontend expects the backend to run on `http://localhost:3000`.
+- The backend allows credentialed CORS requests from `http://localhost:5173` by default.
+- Authentication depends on Better Auth sessions, so API requests must include credentials.
+- The frontend uses React Flow and ELK.js to render and lay out family trees.
 - Prisma client output is configured under `backend/src/generated/prisma`.
+- `README.md` describes the currently implemented project. `docs/PRD.md`, `docs/API.md`, and phase documents remain the source of truth for the V1 plan.
+- When a change affects setup, authentication, environment variables, architecture, developer workflow, major user-visible features, or documented API usage, update `README.md` in the same PR.
 
 ## Credits
 

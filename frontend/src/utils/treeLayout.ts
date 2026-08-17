@@ -69,10 +69,10 @@ export async function layoutTree(
   // Helper for full names
   const fullName = (id: string) => {
     const p = personById.get(id)!;
-    return `${p.firstName} ${p.lastName}`;
+    return [p.firstName, p.lastName].filter(Boolean).join(" ");
   };
 
-  const parentRels = relationships.filter((r) => r.type === "PARENT");
+  const parentRels = relationships.filter((r) => r.type === "PARENT_CHILD");
 
   // childId → Set<parentId>
   const parentsOf = new Map<string, Set<string>>();

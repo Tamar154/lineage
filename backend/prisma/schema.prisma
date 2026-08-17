@@ -8,30 +8,42 @@ datasource db {
 }
 
 model Tree {
-  id String @id @default(uuid())
-  name String
-  ownerId String
+  id             String @id @default(uuid())
+  ownerId        String
+  name           String
+  normalizedName String
+  description    String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   persons Person[]
   relationships Relationship[]
 
+  @@unique([ownerId, normalizedName])
   @@index([ownerId])
 }
 
 model Person {
   id String @id @default(uuid())
-  firstName String
-  lastName String
-  birthDate DateTime?
-  deathDate DateTime?
-  bio String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+
   treeId String
   tree Tree @relation(fields: [treeId], references: [id], onDelete: Cascade)
+
+  firstName String
+  lastName String?
+  gender Gender @default(UNKNOWN)
+
+  birthDate String?
+  birthDatePrecision DatePrecision?
+  deathDate String?
+  deathDatePrecision DatePrecision?
+
+  birthPlace String?
+  biography String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   relationshipsA Relationship[] @relation("A")
   relationshipsB Relationship[] @relation("B")
@@ -53,6 +65,9 @@ model Relationship {
 
   type RelationshipType
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@unique([treeId, personAId, personBId, type])
   @@index([treeId])
   @@index([personAId])
@@ -60,8 +75,21 @@ model Relationship {
 }
 
 enum RelationshipType {
-  PARENT
+  PARENT_CHILD
   SPOUSE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  UNKNOWN
+}
+
+enum DatePrecision {
+  YEAR
+  MONTH
+  DAY
 }
 
 model User {

@@ -91,7 +91,9 @@ const AddRelationshipModal = ({
     });
   };
 
-  const fullName = `${sourcePerson.firstName} ${sourcePerson.lastName}`;
+  const fullName = [sourcePerson.firstName, sourcePerson.lastName]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div className={styles.wrapper}>

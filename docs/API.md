@@ -256,9 +256,9 @@ Fields:
 - firstName
 - lastName
 - gender
-- birthDateValue
+- birthDate
 - birthDatePrecision
-- deathDateValue
+- deathDate
 - deathDatePrecision
 - birthPlace
 - biography

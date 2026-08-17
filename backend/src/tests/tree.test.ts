@@ -35,6 +35,50 @@ describe("Tree", () => {
       expect(tree.name).toBe("My Tree");
     });
 
+    it("normalizes the display name, unique name, and description", async () => {
+      const res = await user.agent.post("/api/trees").send({
+        name: "  The   Cohen\tFamily  ",
+        description: "  Main family tree  ",
+      });
+
+      expect(res.status).toBe(201);
+      expect(res.body.data).toMatchObject({
+        name: "The Cohen Family",
+        normalizedName: "the cohen family",
+        description: "Main family tree",
+      });
+    });
+
+    it("rejects case and whitespace variants for the same owner", async () => {
+      expect((await user.agent.post("/api/trees").send({ name: "Cohen Family" })).status).toBe(201);
+      expect((await user.agent.post("/api/trees").send({ name: " cohen   family " })).status).toBe(400);
+    });
+
+    it("allows different owners to use the same normalized name", async () => {
+      const other = createUserAgent();
+      await other.register();
+      await other.login();
+
+      expect((await user.agent.post("/api/trees").send({ name: "Cohen Family" })).status).toBe(201);
+      expect((await other.agent.post("/api/trees").send({ name: " cohen  family " })).status).toBe(201);
+    });
+
+    it("stores omitted and empty descriptions as null", async () => {
+      const omitted = await user.agent.post("/api/trees").send({ name: "One" });
+      const empty = await user.agent.post("/api/trees").send({ name: "Two", description: "   " });
+      expect(omitted.body.data.description).toBeNull();
+      expect(empty.body.data.description).toBeNull();
+    });
+
+    it("does not accept ownerId or normalizedName from input", async () => {
+      const res = await user.agent.post("/api/trees").send({
+        name: "Secure",
+        ownerId: randomUUID(),
+        normalizedName: "hijacked",
+      });
+      expect(res.status).toBe(400);
+    });
+
     it("Should not allow creating a tree with the same name", async () => {
       await user.agent.post("/api/trees").send({ name: "My Tree" });
       const res = await user.agent.post("/api/trees").send({ name: "My Tree" });

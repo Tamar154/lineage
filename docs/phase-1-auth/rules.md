@@ -75,3 +75,5 @@ After implementation, verify:
 - user A cannot access user B’s tree
 
 If any required information is missing, stop and ask instead of guessing.
+
+README impact assessment: If this phase changes setup, authentication, environment variables, architecture, user-visible features, routes/API usage, tech stack, or developer workflow, update README.md. Otherwise explicitly mark README update as not required.

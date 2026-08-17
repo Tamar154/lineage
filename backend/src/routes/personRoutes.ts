@@ -12,6 +12,7 @@ import { parseParams, validateBody } from "../middleware/zodValidation.js";
 import {
   createPersonSchema,
   personParamsSchema,
+  updatePersonSchema,
 } from "../validators/personValidators.js";
 
 const router = express.Router({ mergeParams: true });
@@ -25,7 +26,7 @@ router.get("/:id", parseParams(personParamsSchema), getPersonById);
 router.put(
   "/:id",
   parseParams(personParamsSchema),
-  validateBody(createPersonSchema),
+  validateBody(updatePersonSchema),
   updatePerson,
 );
 router.delete("/:id", parseParams(personParamsSchema), deletePerson);

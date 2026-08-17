@@ -93,7 +93,7 @@ const TreePage = () => {
     if (!treeId || !selectedPerson) return;
 
     const isConfirmed = window.confirm(
-      `Are you sure you want to remove ${selectedPerson.firstName} ${selectedPerson.lastName}?`,
+      `Are you sure you want to remove ${[selectedPerson.firstName, selectedPerson.lastName].filter(Boolean).join(" ")}?`,
     );
 
     if (!isConfirmed) return;
@@ -182,8 +182,10 @@ const TreePage = () => {
             firstName: selectedPerson.firstName,
             lastName: selectedPerson.lastName,
             birthDate: selectedPerson.birthDate || "",
+            birthDatePrecision: selectedPerson.birthDatePrecision,
             deathDate: selectedPerson.deathDate || "",
-            bio: selectedPerson.bio || "",
+            deathDatePrecision: selectedPerson.deathDatePrecision,
+            biography: selectedPerson.biography || "",
           }}
           onClose={() => setShowEditPersonModal(false)}
           onSubmit={handleEditPerson}

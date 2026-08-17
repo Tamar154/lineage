@@ -237,9 +237,9 @@ Dates support partial precision:
 Fields:
 
 ```ts
-birthDateValue: string | null;
+birthDate: string | null;
 birthDatePrecision: DatePrecision | null;
-deathDateValue: string | null;
+deathDate: string | null;
 deathDatePrecision: DatePrecision | null;
 ```
 
@@ -290,14 +290,14 @@ Storage meaning:
 For `PARENT_CHILD`:
 
 ```txt
-person1Id = parent
-person2Id = child
+personAId = parent
+personBId = child
 ```
 
 For `SPOUSE`:
 
 ```txt
-person1Id/person2Id are normalized by backend logic.
+personAId/personBId are normalized by backend logic.
 Spouse direction has no family meaning.
 ```
 

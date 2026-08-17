@@ -1,18 +1,14 @@
 import type { RelationshipType } from "../generated/prisma/index.js";
+import type { PersonData } from "./person.js";
 
 export type GraphResponse = {
   status: "success";
   data: {
     id: string;
     name: string;
-    persons: {
-      id: string;
-      firstName: string;
-      lastName: string;
-      birthDate: Date | null;
-      deathDate: Date | null;
-      bio: string | null;
-    }[];
+    normalizedName: string;
+    description: string | null;
+    persons: PersonData[];
     relationships: {
       id: string;
       personAId: string;

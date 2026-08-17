@@ -5,7 +5,10 @@ import type {
   RelationshipInput,
   RelationshipParams,
 } from "../validators/relationshipValidators.js";
-import { validateRelationship } from "../services/relationshipService.js";
+import {
+  createRelationshipRecord,
+  validateRelationship,
+} from "../services/relationshipService.js";
 import { normalizeRelationship } from "../services/normalizeRelationship.js";
 import type { RelationshipResponse } from "../types/relationship.js";
 
@@ -17,24 +20,11 @@ const createRelationship: RequestHandler<
   const { personAId, personBId, type } = req.body;
   const treeId = req.tree.id;
 
-  // Normalize the relationship to enforce unique constraint regardless of order
-  const normalized = normalizeRelationship(personAId, personBId, type);
-
-  await validateRelationship(
-    normalized.personAId,
-    normalized.personBId,
-    type,
+  const relationship = await createRelationshipRecord({
     treeId,
-  );
-
-  // Create new relationship
-  const relationship = await prisma.relationship.create({
-    data: {
-      treeId,
-      personAId: normalized.personAId,
-      personBId: normalized.personBId,
-      type,
-    },
+    personAId,
+    personBId,
+    type,
   });
 
   res.status(201).json({

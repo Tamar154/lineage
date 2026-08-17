@@ -36,6 +36,26 @@ describe("Relationship V1 schema", () => {
     expect(await prisma.relationship.count({ where: { treeId, type: "SPOUSE" } })).toBe(1);
   });
 
+  it("rejects A-C when A-B are already spouses", async () => {
+    const c = (await user.agent
+      .post(`/api/trees/${treeId}/persons`)
+      .send({ firstName: "C" })).body.data.id;
+
+    expect((await create({ personAId: a, personBId: b, type: "SPOUSE" })).status).toBe(201);
+    expect((await create({ personAId: a, personBId: c, type: "SPOUSE" })).status).toBe(400);
+    expect(await prisma.relationship.count({ where: { treeId, type: "SPOUSE" } })).toBe(1);
+  });
+
+  it("rejects C-B when A-B are already spouses", async () => {
+    const c = (await user.agent
+      .post(`/api/trees/${treeId}/persons`)
+      .send({ firstName: "C" })).body.data.id;
+
+    expect((await create({ personAId: a, personBId: b, type: "SPOUSE" })).status).toBe(201);
+    expect((await create({ personAId: c, personBId: b, type: "SPOUSE" })).status).toBe(400);
+    expect(await prisma.relationship.count({ where: { treeId, type: "SPOUSE" } })).toBe(1);
+  });
+
   it("rejects exact directed duplicates and self relationships", async () => {
     expect((await create({ personAId: a, personBId: b, type: "PARENT_CHILD" })).status).toBe(201);
     expect((await create({ personAId: a, personBId: b, type: "PARENT_CHILD" })).status).toBe(400);

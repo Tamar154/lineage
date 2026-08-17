@@ -9,6 +9,7 @@ import { normalizeRelationship } from "./normalizeRelationship.js";
  * - A person cannot have a relationship with themselves.
  * - Both persons must belong to the same tree.
  * - The same relationship cannot already exist.
+ * - A person cannot have more than one spouse.
  * - For parent-child relationships, circular relationships are not allowed (e.g., A cannot be a parent of B if B is already a parent of A).
  * If any of these conditions are violated, an AppError is thrown with an appropriate message and status code.
  *
@@ -57,6 +58,24 @@ export async function validateRelationship(
 
   if (existing) {
     throw new AppError("This relationship already exists", 400);
+  }
+
+  if (type === RelationshipType.SPOUSE) {
+    const existingSpouse = await prisma.relationship.findFirst({
+      where: {
+        treeId,
+        type: RelationshipType.SPOUSE,
+        OR: [
+          { personAId: { in: [personAId, personBId] } },
+          { personBId: { in: [personAId, personBId] } },
+        ],
+        ...(currentRelId && { NOT: { id: currentRelId } }),
+      },
+    });
+
+    if (existingSpouse) {
+      throw new AppError("A person cannot have more than one spouse", 400);
+    }
   }
 
   if (type === RelationshipType.PARENT_CHILD) {

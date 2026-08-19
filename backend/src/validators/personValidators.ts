@@ -91,7 +91,7 @@ export const updatePersonSchema = z
   .refine((value) => Object.keys(value).length > 0, "At least one field is required");
 
 export const personParamsSchema = z.object({
-  id: z.uuid(),
+  personId: z.uuid(),
 });
 
 export type CreatePersonInput = z.infer<typeof createPersonSchema>;

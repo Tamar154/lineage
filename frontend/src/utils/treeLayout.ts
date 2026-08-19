@@ -1,7 +1,7 @@
 import ELK from "elkjs/lib/elk.bundled.js";
 import type { Edge, Node } from "@xyflow/react";
 import type { Person } from "../services/personService";
-import type { Relationship } from "../services/graphService";
+import type { Relationship } from "../services/fullTreeService";
 
 const elk = new ELK();
 

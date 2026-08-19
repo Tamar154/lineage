@@ -15,7 +15,7 @@ import AppError from "./utils/AppError.js";
 import treeRoutes from "./routes/treeRoutes.js";
 import personRoutes from "./routes/personRoutes.js";
 import relationshipRoutes from "./routes/relationshipRoutes.js";
-import graphRoutes from "./routes/graphRoutes.js";
+import fullTreeRoutes from "./routes/fullTreeRoutes.js";
 
 export const app = express();
 
@@ -33,9 +33,9 @@ app.use(loggerMiddleware);
 
 // Routes
 app.use("/api/trees", treeRoutes);
-app.use("/api/trees/:treeId/persons", personRoutes);
+app.use("/api/trees/:treeId/people", personRoutes);
 app.use("/api/trees/:treeId/relationships", relationshipRoutes);
-app.use("/api/trees/:treeId/graph", graphRoutes);
+app.use("/api/trees/:treeId/full", fullTreeRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

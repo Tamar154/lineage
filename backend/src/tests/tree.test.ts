@@ -19,8 +19,11 @@ describe("Tree", () => {
       const res = await user.agent.post("/api/trees").send({ name: "My Tree" });
 
       expect(res.status).toBe(201);
-      expect(res.body.status).toBe("success");
+      expect(res.body).not.toHaveProperty("status");
       expect(res.body.data.name).toBe("My Tree");
+      expect(Object.keys(res.body.data).sort()).toEqual(
+        ["id", "name", "description", "createdAt", "updatedAt"].sort(),
+      );
 
       // Verify tree is in the database
       const tree = await prisma.tree.findUnique({
@@ -44,9 +47,10 @@ describe("Tree", () => {
       expect(res.status).toBe(201);
       expect(res.body.data).toMatchObject({
         name: "The Cohen Family",
-        normalizedName: "the cohen family",
         description: "Main family tree",
       });
+      expect(res.body.data).not.toHaveProperty("normalizedName");
+      expect(res.body.data).not.toHaveProperty("ownerId");
     });
 
     it("rejects case and whitespace variants for the same owner", async () => {
@@ -130,7 +134,7 @@ describe("Tree", () => {
       const res = await user.agent.get("/api/trees");
 
       expect(res.status).toBe(200);
-      expect(res.body.status).toBe("success");
+      expect(res.body).not.toHaveProperty("status");
       expect(res.body.data).toHaveLength(2);
       expect(res.body.data[0].name).toBe("User's Tree1");
       expect(res.body.data[1].name).toBe("User's Tree2");
@@ -155,7 +159,7 @@ describe("Tree", () => {
 
       const res = await user.agent.get("/api/trees");
       expect(res.status).toBe(200);
-      expect(res.body.status).toBe("success");
+      expect(res.body).not.toHaveProperty("status");
       expect(res.body.data).toHaveLength(0);
     });
 
@@ -163,7 +167,7 @@ describe("Tree", () => {
       const res = await user.agent.get("/api/trees");
 
       expect(res.status).toBe(200);
-      expect(res.body.status).toBe("success");
+      expect(res.body).not.toHaveProperty("status");
       expect(res.body.data).toEqual([]);
     });
   });
@@ -178,7 +182,7 @@ describe("Tree", () => {
       const res = await user.agent.get(`/api/trees/${treeId}`);
 
       expect(res.status).toBe(200);
-      expect(res.body.status).toBe("success");
+      expect(res.body).not.toHaveProperty("status");
       expect(res.body.data.id).toBe(treeId);
       expect(res.body.data.name).toBe("Family Tree");
     });
@@ -238,6 +242,7 @@ describe("Tree", () => {
       const res = await user.agent.delete(`/api/trees/${treeId}`);
 
       expect(res.status).toBe(204);
+      expect(res.text).toBe("");
 
       const tree = await prisma.tree.findUnique({ where: { id: treeId } });
       expect(tree).toBeNull();

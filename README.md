@@ -132,13 +132,11 @@ GOOGLE_CLIENT_SECRET=
 
 Use separate application and direct connection URLs for your development and test databases. The test setup clears the test database, so never point the test variables at data you need to keep.
 
-````
-
 Generate the custom Prisma client in `backend/src/generated/prisma`:
 
 ```bash
 npx prisma generate
-````
+```
 
 Apply migrations to the development database:
 
@@ -245,7 +243,9 @@ Application API base URL:
 http://localhost:3000/api
 ```
 
-Tree, person, relationship, and graph routes require an authenticated Better Auth session. Requests from the frontend include credentials so the backend can validate the session.
+Tree, person, relationship, and full-tree routes require an authenticated Better Auth session. Requests from the frontend include credentials so the backend can validate the session.
+
+Successful LineAge JSON responses use `{ "data": ... }`. Successful deletes return `204 No Content` without a response body. Response DTOs expose only public resource fields; ownership, normalized names, nested tree IDs, and persistence timestamps for people and relationships are omitted.
 
 ### Authentication
 
@@ -262,13 +262,14 @@ Better Auth owns the authentication endpoints; application domain routes are doc
 
 ### Trees
 
-| Method   | Endpoint         | Description                                   |
-| -------- | ---------------- | --------------------------------------------- |
-| `GET`    | `/trees`         | Get all trees owned by the authenticated user |
-| `POST`   | `/trees`         | Create a tree                                 |
-| `GET`    | `/trees/:treeId` | Get an owned tree                             |
-| `PATCH`  | `/trees/:treeId` | Update an owned tree                          |
-| `DELETE` | `/trees/:treeId` | Delete an owned tree                          |
+| Method   | Endpoint              | Description                                   |
+| -------- | --------------------- | --------------------------------------------- |
+| `GET`    | `/trees`              | Get all trees owned by the authenticated user |
+| `POST`   | `/trees`              | Create a tree                                 |
+| `GET`    | `/trees/:treeId`      | Get an owned tree                             |
+| `PATCH`  | `/trees/:treeId`      | Update an owned tree                          |
+| `DELETE` | `/trees/:treeId`      | Delete an owned tree                          |
+| `GET`    | `/trees/:treeId/full` | Load tree metadata, people, and relationships |
 
 Tree names are trimmed and normalized for case-insensitive per-owner uniqueness. Descriptions are optional.
 
@@ -285,24 +286,22 @@ POST /api/trees
 }
 ```
 
-### Persons
+### People
 
-| Method   | Endpoint                     | Description              |
-| -------- | ---------------------------- | ------------------------ |
-| `POST`   | `/trees/:treeId/persons`     | Add a person to a tree   |
-| `GET`    | `/trees/:treeId/persons`     | Get all people in a tree |
-| `GET`    | `/trees/:treeId/persons/:id` | Get one person by ID     |
-| `PUT`    | `/trees/:treeId/persons/:id` | Update a person          |
-| `DELETE` | `/trees/:treeId/persons/:id` | Delete a person          |
+| Method   | Endpoint                          | Description            |
+| -------- | --------------------------------- | ---------------------- |
+| `POST`   | `/trees/:treeId/people`           | Add a person to a tree |
+| `PATCH`  | `/trees/:treeId/people/:personId` | Update a person        |
+| `DELETE` | `/trees/:treeId/people/:personId` | Delete a person        |
 
 #### Create or Update Person
 
 ```http
-POST /api/trees/:treeId/persons
+POST /api/trees/:treeId/people
 ```
 
 ```http
-PUT /api/trees/:treeId/persons/:id
+PATCH /api/trees/:treeId/people/:personId
 ```
 
 Example request body:
@@ -325,41 +324,34 @@ Only `firstName` is required. Gender defaults to `UNKNOWN`; supported values are
 
 ### Relationships
 
-| Method   | Endpoint                           | Description                           |
-| -------- | ---------------------------------- | ------------------------------------- |
-| `POST`   | `/trees/:treeId/relationships`     | Add a relationship between two people |
-| `GET`    | `/trees/:treeId/relationships`     | Get all relationships in a tree       |
-| `GET`    | `/trees/:treeId/relationships/:id` | Get one relationship by ID            |
-| `PUT`    | `/trees/:treeId/relationships/:id` | Update a relationship                 |
-| `DELETE` | `/trees/:treeId/relationships/:id` | Delete a relationship                 |
+| Method   | Endpoint                                       | Description                           |
+| -------- | ---------------------------------------------- | ------------------------------------- |
+| `POST`   | `/trees/:treeId/relationships`                 | Add a relationship between two people |
+| `DELETE` | `/trees/:treeId/relationships/:relationshipId` | Delete a relationship                 |
 
-#### Create or Update Relationship
+#### Create Relationship
 
 ```http
 POST /api/trees/:treeId/relationships
-```
-
-```http
-PUT /api/trees/:treeId/relationships/:id
 ```
 
 ```json
 {
   "personAId": "person-id-1",
   "personBId": "person-id-2",
-  "type": "PARENT_CHILD"
+  "relation": "PARENT"
 }
 ```
 
-Supported relationship types are `PARENT_CHILD` and `SPOUSE`. For `PARENT_CHILD`, person A is the parent and person B is the child. Spouse relationships are normalized before storage.
+Accepted request relations are `PARENT`, `CHILD`, and `SPOUSE`. `PARENT` means A is parent of B; `CHILD` means A is child of B. The response uses the canonical stored types `PARENT_CHILD` and `SPOUSE`, with spouse pairs normalized by the backend.
 
-### Graph
+### Full Tree
 
-| Method | Endpoint               | Description                                                  |
-| ------ | ---------------------- | ------------------------------------------------------------ |
-| `GET`  | `/trees/:treeId/graph` | Get graph-ready tree data including people and relationships |
+| Method | Endpoint              | Description                                  |
+| ------ | --------------------- | -------------------------------------------- |
+| `GET`  | `/trees/:treeId/full` | Get tree metadata, people, and relationships |
 
-The graph response contains the owned tree, its people with current person fields, and relationships using the same `PARENT_CHILD` and `SPOUSE` values described above. The frontend uses this response to generate the React Flow visualization automatically.
+The response is `{ "data": { "tree": TreeDto, "people": PersonDto[], "relationships": RelationshipDto[] } }`. It contains family data only; the frontend generates React Flow positions and layout.
 
 ## Data Model
 

@@ -2,8 +2,6 @@ import express from "express";
 import {
   createPerson,
   deletePerson,
-  getPersonById,
-  getPersons,
   updatePerson,
 } from "../controllers/personController.js";
 import { validateOwner } from "../middleware/validateOwner.js";
@@ -21,14 +19,12 @@ router.use(requireAuth);
 router.use(validateOwner); // All routes require ownership validation
 
 router.post("/", validateBody(createPersonSchema), createPerson);
-router.get("/", getPersons);
-router.get("/:id", parseParams(personParamsSchema), getPersonById);
-router.put(
-  "/:id",
+router.patch(
+  "/:personId",
   parseParams(personParamsSchema),
   validateBody(updatePersonSchema),
   updatePerson,
 );
-router.delete("/:id", parseParams(personParamsSchema), deletePerson);
+router.delete("/:personId", parseParams(personParamsSchema), deletePerson);
 
 export default router;

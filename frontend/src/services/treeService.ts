@@ -9,13 +9,13 @@ type GetTreeByIdData = {
 };
 
 type ApiResponse<T> = {
-  status: string;
   data: T;
 };
 
 export type Tree = {
   id: string;
   name: string;
+  description: string | null;
   createdAt: string;
   updatedAt: string;
 };

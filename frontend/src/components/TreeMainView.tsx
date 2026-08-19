@@ -10,7 +10,7 @@ import {
 } from "@xyflow/react";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa6";
-import type { Relationship } from "../services/graphService";
+import type { Relationship } from "../services/fullTreeService";
 import type { Person } from "../services/personService";
 import { layoutTree } from "../utils/treeLayout";
 import styles from "../styles/TreeMainView.module.css";

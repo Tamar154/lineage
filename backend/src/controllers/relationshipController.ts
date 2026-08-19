@@ -2,130 +2,31 @@ import type { RequestHandler } from "express";
 import { prisma } from "../config/db.js";
 import AppError from "../utils/AppError.js";
 import type {
-  RelationshipInput,
+  CreateRelationshipInput,
   RelationshipParams,
 } from "../validators/relationshipValidators.js";
 import {
   createRelationshipRecord,
-  validateRelationship,
+  translateRelationshipRequest,
 } from "../services/relationshipService.js";
-import { normalizeRelationship } from "../services/normalizeRelationship.js";
-import type { RelationshipResponse } from "../types/relationship.js";
+import type { ApiSuccess } from "../dtos/apiSuccess.js";
+import { toRelationshipDto, type RelationshipDto } from "../dtos/relationshipDto.js";
 
 const createRelationship: RequestHandler<
   Record<string, never>,
-  RelationshipResponse,
-  RelationshipInput
+  ApiSuccess<RelationshipDto>,
+  CreateRelationshipInput
 > = async (req, res) => {
-  const { personAId, personBId, type } = req.body;
   const treeId = req.tree.id;
+  const relationshipWrite = translateRelationshipRequest(req.body);
 
   const relationship = await createRelationshipRecord({
     treeId,
-    personAId,
-    personBId,
-    type,
+    ...relationshipWrite,
   });
 
   res.status(201).json({
-    status: "success",
-    data: {
-      id: relationship.id,
-      personAId: relationship.personAId,
-      personBId: relationship.personBId,
-      type: relationship.type,
-    },
-  });
-};
-
-const getRelationships: RequestHandler = async (req, res) => {
-  const relationships = await prisma.relationship.findMany({
-    where: { treeId: req.tree.id },
-  });
-
-  res.json({
-    status: "success",
-    data: relationships.map((r) => ({
-      id: r.id,
-      personAId: r.personAId,
-      personBId: r.personBId,
-      type: r.type,
-    })),
-  });
-};
-
-const getRelationshipById: RequestHandler<
-  RelationshipParams,
-  RelationshipResponse,
-  Record<string, never>
-> = async (req, res) => {
-  const { id } = req.params;
-
-  const relationship = await prisma.relationship.findFirst({
-    where: { id, treeId: req.tree.id },
-  });
-
-  if (!relationship) {
-    throw new AppError("Relationship not found", 404);
-  }
-
-  res.json({
-    status: "success",
-    data: {
-      id: relationship.id,
-      personAId: relationship.personAId,
-      personBId: relationship.personBId,
-      type: relationship.type,
-    },
-  });
-};
-
-const updateRelationship: RequestHandler<
-  RelationshipParams,
-  RelationshipResponse,
-  RelationshipInput
-> = async (req, res) => {
-  const { id } = req.params;
-  const { personAId, personBId, type } = req.body;
-  const treeId = req.tree.id;
-
-  // Check if relationship exists and belongs to the tree
-  const existing = await prisma.relationship.findFirst({
-    where: { id, treeId },
-  });
-
-  if (!existing) {
-    throw new AppError("Relationship not found", 404);
-  }
-
-  const normalized = normalizeRelationship(personAId, personBId, type);
-
-  await validateRelationship(
-    normalized.personAId,
-    normalized.personBId,
-    type,
-    treeId,
-    id,
-  );
-
-  // Update relationship
-  const updated = await prisma.relationship.update({
-    where: { id },
-    data: {
-      personAId: normalized.personAId,
-      personBId: normalized.personBId,
-      type,
-    },
-  });
-
-  res.json({
-    status: "success",
-    data: {
-      id: updated.id,
-      personAId: updated.personAId,
-      personBId: updated.personBId,
-      type: updated.type,
-    },
+    data: toRelationshipDto(relationship),
   });
 };
 
@@ -133,12 +34,12 @@ const deleteRelationship: RequestHandler<RelationshipParams> = async (
   req,
   res,
 ) => {
-  const { id } = req.params;
+  const { relationshipId } = req.params;
   const treeId = req.tree.id;
 
   // Check if relationship exists and belongs to the tree
   const existing = await prisma.relationship.findFirst({
-    where: { id, treeId },
+    where: { id: relationshipId, treeId },
   });
 
   if (!existing) {
@@ -146,7 +47,7 @@ const deleteRelationship: RequestHandler<RelationshipParams> = async (
   }
 
   await prisma.relationship.delete({
-    where: { id },
+    where: { id: relationshipId },
   });
 
   res.status(204).send();
@@ -154,8 +55,5 @@ const deleteRelationship: RequestHandler<RelationshipParams> = async (
 
 export {
   createRelationship,
-  getRelationships,
-  getRelationshipById,
-  updateRelationship,
   deleteRelationship,
 };

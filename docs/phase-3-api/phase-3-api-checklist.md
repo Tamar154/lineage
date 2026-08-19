@@ -268,23 +268,23 @@ Only check an item after it has been implemented and verified. Compilation is no
 
 Backend/API:
 
-- [ ] Start the backend with the isolated development/test setup.
-- [ ] Verify each retained endpoint responds with the documented method.
-- [ ] Verify retired endpoints are unavailable.
-- [ ] Verify response bodies contain only allowlisted fields.
-- [ ] Verify `/full` works for empty and populated trees.
+- [x] Start the backend with the isolated development/test setup.
+- [x] Verify each retained endpoint responds with the documented method.
+- [x] Verify retired endpoints are unavailable.
+- [x] Verify response bodies contain only allowlisted fields.
+- [x] Verify `/full` works for empty and populated trees.
 
 Frontend/browser:
 
-- [ ] Register or log in.
-- [ ] Tree dashboard loads.
-- [ ] Empty tree opens through `/full`.
-- [ ] Person create works through `/people`.
-- [ ] Person edit works through `PATCH`.
-- [ ] Relationship creation works through `relation` input.
-- [ ] Current visual tree renders and refreshes.
-- [ ] Person and relationship deletion still work.
-- [ ] Logout still blocks private access.
+- [x] Register or log in.
+- [x] Tree dashboard loads.
+- [x] Empty tree opens through `/full`.
+- [x] Person create works through `/people`.
+- [x] Person edit works through `PATCH`.
+- [x] Relationship creation works through `relation` input.
+- [x] Current visual tree renders and refreshes.
+- [x] Person and relationship deletion still work.
+- [x] Logout still blocks private access.
 
 Do not check browser items based solely on API tests or builds.
 

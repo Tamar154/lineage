@@ -132,13 +132,11 @@ GOOGLE_CLIENT_SECRET=
 
 Use separate application and direct connection URLs for your development and test databases. The test setup clears the test database, so never point the test variables at data you need to keep.
 
-````
-
 Generate the custom Prisma client in `backend/src/generated/prisma`:
 
 ```bash
 npx prisma generate
-````
+```
 
 Apply migrations to the development database:
 
@@ -264,13 +262,13 @@ Better Auth owns the authentication endpoints; application domain routes are doc
 
 ### Trees
 
-| Method   | Endpoint         | Description                                   |
-| -------- | ---------------- | --------------------------------------------- |
-| `GET`    | `/trees`         | Get all trees owned by the authenticated user |
-| `POST`   | `/trees`         | Create a tree                                 |
-| `GET`    | `/trees/:treeId` | Get an owned tree                             |
-| `PATCH`  | `/trees/:treeId` | Update an owned tree                          |
-| `DELETE` | `/trees/:treeId` | Delete an owned tree                          |
+| Method   | Endpoint              | Description                                   |
+| -------- | --------------------- | --------------------------------------------- |
+| `GET`    | `/trees`              | Get all trees owned by the authenticated user |
+| `POST`   | `/trees`              | Create a tree                                 |
+| `GET`    | `/trees/:treeId`      | Get an owned tree                             |
+| `PATCH`  | `/trees/:treeId`      | Update an owned tree                          |
+| `DELETE` | `/trees/:treeId`      | Delete an owned tree                          |
 | `GET`    | `/trees/:treeId/full` | Load tree metadata, people, and relationships |
 
 Tree names are trimmed and normalized for case-insensitive per-owner uniqueness. Descriptions are optional.
@@ -290,11 +288,11 @@ POST /api/trees
 
 ### People
 
-| Method   | Endpoint                     | Description              |
-| -------- | ---------------------------- | ------------------------ |
-| `POST`   | `/trees/:treeId/people`                  | Add a person to a tree |
-| `PATCH`  | `/trees/:treeId/people/:personId`        | Update a person        |
-| `DELETE` | `/trees/:treeId/people/:personId`        | Delete a person        |
+| Method   | Endpoint                          | Description            |
+| -------- | --------------------------------- | ---------------------- |
+| `POST`   | `/trees/:treeId/people`           | Add a person to a tree |
+| `PATCH`  | `/trees/:treeId/people/:personId` | Update a person        |
+| `DELETE` | `/trees/:treeId/people/:personId` | Delete a person        |
 
 #### Create or Update Person
 
@@ -326,10 +324,10 @@ Only `firstName` is required. Gender defaults to `UNKNOWN`; supported values are
 
 ### Relationships
 
-| Method   | Endpoint                           | Description                           |
-| -------- | ---------------------------------- | ------------------------------------- |
-| `POST`   | `/trees/:treeId/relationships`     | Add a relationship between two people |
-| `DELETE` | `/trees/:treeId/relationships/:relationshipId` | Delete a relationship       |
+| Method   | Endpoint                                       | Description                           |
+| -------- | ---------------------------------------------- | ------------------------------------- |
+| `POST`   | `/trees/:treeId/relationships`                 | Add a relationship between two people |
+| `DELETE` | `/trees/:treeId/relationships/:relationshipId` | Delete a relationship                 |
 
 #### Create Relationship
 
@@ -349,8 +347,8 @@ Accepted request relations are `PARENT`, `CHILD`, and `SPOUSE`. `PARENT` means A
 
 ### Full Tree
 
-| Method | Endpoint               | Description                                                  |
-| ------ | ---------------------- | ------------------------------------------------------------ |
+| Method | Endpoint              | Description                                  |
+| ------ | --------------------- | -------------------------------------------- |
 | `GET`  | `/trees/:treeId/full` | Get tree metadata, people, and relationships |
 
 The response is `{ "data": { "tree": TreeDto, "people": PersonDto[], "relationships": RelationshipDto[] } }`. It contains family data only; the frontend generates React Flow positions and layout.

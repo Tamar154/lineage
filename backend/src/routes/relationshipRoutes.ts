@@ -1,9 +1,6 @@
 import express from "express";
 import {
   createRelationship,
-  getRelationships,
-  getRelationshipById,
-  updateRelationship,
   deleteRelationship,
 } from "../controllers/relationshipController.js";
 import { requireAuth } from "../auth/requireAuth.js";
@@ -20,14 +17,10 @@ router.use(requireAuth);
 router.use(validateOwner); // All routes require ownership validation
 
 router.post("/", validateBody(createRelSchema), createRelationship);
-router.get("/", getRelationships);
-router.get("/:id", parseParams(relParamsSchema), getRelationshipById);
-router.put(
-  "/:id",
+router.delete(
+  "/:relationshipId",
   parseParams(relParamsSchema),
-  validateBody(createRelSchema),
-  updateRelationship,
+  deleteRelationship,
 );
-router.delete("/:id", parseParams(relParamsSchema), deleteRelationship);
 
 export default router;

@@ -17,7 +17,7 @@ describe("Person V1 schema", () => {
   });
 
   const createPerson = (body: Record<string, unknown> = { firstName: "Tamar" }) =>
-    user.agent.post(`/api/trees/${treeId}/persons`).send(body);
+    user.agent.post(`/api/trees/${treeId}/people`).send(body);
 
   it("creates a person with first name only and database defaults", async () => {
     const response = await createPerson({ firstName: "  Tamar  " });
@@ -33,6 +33,9 @@ describe("Person V1 schema", () => {
       birthPlace: null,
       biography: null,
     });
+    expect(Object.keys(response.body.data).sort()).toEqual(
+      ["id", "firstName", "lastName", "gender", "birthDate", "birthDatePrecision", "deathDate", "deathDatePrecision", "birthPlace", "biography"].sort(),
+    );
   });
 
   it("normalizes optional strings and accepts every gender", async () => {
@@ -105,17 +108,17 @@ describe("Person V1 schema", () => {
       birthDate: "1990",
       birthDatePrecision: "YEAR",
     });
-    const url = `/api/trees/${treeId}/persons/${created.body.data.id}`;
+    const url = `/api/trees/${treeId}/people/${created.body.data.id}`;
 
-    const renamed = await user.agent.put(url).send({ firstName: "Updated" });
+    const renamed = await user.agent.patch(url).send({ firstName: "Updated" });
     expect(renamed.status).toBe(200);
     expect(renamed.body.data.lastName).toBe("Name");
     expect(renamed.body.data.birthDate).toBe("1990");
 
-    const halfClear = await user.agent.put(url).send({ birthDate: null });
+    const halfClear = await user.agent.patch(url).send({ birthDate: null });
     expect(halfClear.status).toBe(400);
 
-    const cleared = await user.agent.put(url).send({
+    const cleared = await user.agent.patch(url).send({
       birthDate: null,
       birthDatePrecision: null,
       lastName: "",
@@ -128,7 +131,7 @@ describe("Person V1 schema", () => {
 
   it("enforces ownership and authentication", async () => {
     const unauthenticated = await request(app)
-      .post(`/api/trees/${treeId}/persons`)
+      .post(`/api/trees/${treeId}/people`)
       .send({ firstName: "No" });
     expect(unauthenticated.status).toBe(401);
 
@@ -136,7 +139,7 @@ describe("Person V1 schema", () => {
     await other.register();
     await other.login();
     const crossOwner = await other.agent
-      .post(`/api/trees/${treeId}/persons`)
+      .post(`/api/trees/${treeId}/people`)
       .send({ firstName: "No" });
     expect(crossOwner.status).toBe(404);
   });
@@ -153,15 +156,17 @@ describe("Person V1 schema", () => {
     await user.agent.post(`/api/trees/${treeId}/relationships`).send({
       personAId: a.body.data.id,
       personBId: b.body.data.id,
-      type: "PARENT_CHILD",
+      relation: "PARENT",
     });
     await user.agent.post(`/api/trees/${treeId}/relationships`).send({
       personAId: c.body.data.id,
       personBId: a.body.data.id,
-      type: "PARENT_CHILD",
+      relation: "PARENT",
     });
 
-    expect((await user.agent.delete(`/api/trees/${treeId}/persons/${a.body.data.id}`)).status).toBe(204);
+    const deleted = await user.agent.delete(`/api/trees/${treeId}/people/${a.body.data.id}`);
+    expect(deleted.status).toBe(204);
+    expect(deleted.text).toBe("");
     expect(await prisma.relationship.count({ where: { treeId } })).toBe(0);
     expect(await prisma.person.count({ where: { treeId } })).toBe(2);
   });

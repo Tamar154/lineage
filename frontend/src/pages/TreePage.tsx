@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getTreeById, type Tree } from "../services/treeService";
+import type { Tree } from "../services/treeService";
 import { createRelationship } from "../services/relationshipService";
-import { getGraph, type Relationship } from "../services/graphService";
+import { getFullTree, type Relationship } from "../services/fullTreeService";
 import {
   createPerson,
   deletePerson,
@@ -34,23 +34,25 @@ const TreePage = () => {
 
     const fetchTree = async () => {
       try {
-        const res = await getTreeById({ treeId });
-        setTree(res.data);
+        const res = await getFullTree({ treeId });
+        setTree(res.data.tree);
+        setPersons(res.data.people);
+        setRelationships(res.data.relationships);
       } catch (error) {
         console.error(error);
       }
     };
 
     fetchTree();
-    fetchGraph();
   }, [treeId]);
 
-  const fetchGraph = async () => {
+  const fetchFullTree = async () => {
     if (!treeId) return;
 
     try {
-      const res = await getGraph({ treeId });
-      setPersons(res.data.persons);
+      const res = await getFullTree({ treeId });
+      setTree(res.data.tree);
+      setPersons(res.data.people);
       setRelationships(res.data.relationships);
     } catch (error) {
       console.error(error);
@@ -62,7 +64,7 @@ const TreePage = () => {
 
     try {
       await createPerson({ treeId, data });
-      await fetchGraph();
+      await fetchFullTree();
     } catch (error) {
       console.error(error);
     }
@@ -101,7 +103,7 @@ const TreePage = () => {
     try {
       await deletePerson({ treeId, personId: selectedPerson.id });
       setSelectedPerson(null);
-      await fetchGraph();
+      await fetchFullTree();
     } catch (error) {
       console.error(error);
     }
@@ -119,7 +121,7 @@ const TreePage = () => {
           if (data.type === "spouse") {
             return createRelationship({
               treeId,
-              type: "spouse",
+              relation: "SPOUSE",
               sourcePersonId: selectedPerson.id,
               targetPersonId,
             });
@@ -128,7 +130,7 @@ const TreePage = () => {
           if (data.type === "parent") {
             return createRelationship({
               treeId,
-              type: "parent",
+              relation: "PARENT",
               sourcePersonId: selectedPerson.id,
               targetPersonId,
             });
@@ -136,15 +138,15 @@ const TreePage = () => {
 
           return createRelationship({
             treeId,
-            type: "parent",
-            sourcePersonId: targetPersonId,
-            targetPersonId: selectedPerson.id,
+            relation: "CHILD",
+            sourcePersonId: selectedPerson.id,
+            targetPersonId,
           });
         }),
       );
 
       setShowAddRelModal(false);
-      await fetchGraph();
+      await fetchFullTree();
     } catch (error) {
       console.error(error);
     }

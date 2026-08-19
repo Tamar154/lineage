@@ -2,19 +2,19 @@ import api from "../api/axios";
 
 type CreateRelationshipParams = {
   treeId: string;
-  type: "parent" | "spouse";
+  relation: "PARENT" | "CHILD" | "SPOUSE";
   sourcePersonId: string;
   targetPersonId: string;
 };
 
 export const createRelationship = async ({
   treeId,
-  type,
+  relation,
   sourcePersonId,
   targetPersonId,
 }: CreateRelationshipParams) => {
   const res = await api.post(`/trees/${treeId}/relationships`, {
-    type: type === "parent" ? "PARENT_CHILD" : "SPOUSE",
+    relation,
     personAId: sourcePersonId,
     personBId: targetPersonId,
   });

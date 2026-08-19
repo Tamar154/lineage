@@ -6,26 +6,14 @@ import type {
 import { validatePersonDates } from "../validators/personValidators.js";
 import { prisma } from "../config/db.js";
 import AppError from "../utils/AppError.js";
-import type { PersonResponse } from "../types/person.js";
+import type { ApiSuccess } from "../dtos/apiSuccess.js";
+import { personSelect, toPersonDto, type PersonDto } from "../dtos/personDto.js";
 
-type PersonParams = { id: string };
-
-const personSelect = {
-  id: true,
-  firstName: true,
-  lastName: true,
-  gender: true,
-  birthDate: true,
-  birthDatePrecision: true,
-  deathDate: true,
-  deathDatePrecision: true,
-  birthPlace: true,
-  biography: true,
-} as const;
+type PersonParams = { personId: string };
 
 const createPerson: RequestHandler<
   Record<string, never>,
-  PersonResponse,
+  ApiSuccess<PersonDto>,
   CreatePersonInput
 > = async (req, res) => {
   const person = await prisma.person.create({
@@ -44,33 +32,16 @@ const createPerson: RequestHandler<
     select: personSelect,
   });
 
-  res.status(201).json({ status: "success", data: person });
-};
-
-const getPersons: RequestHandler = async (req, res) => {
-  const persons = await prisma.person.findMany({
-    where: { treeId: req.tree.id },
-    select: personSelect,
-  });
-  res.json({ status: "success", data: persons });
-};
-
-const getPersonById: RequestHandler<PersonParams> = async (req, res) => {
-  const person = await prisma.person.findFirst({
-    where: { id: req.params.id, treeId: req.tree.id },
-    select: personSelect,
-  });
-  if (!person) throw new AppError("Person not found", 404);
-  res.json({ status: "success", data: person });
+  res.status(201).json({ data: toPersonDto(person) });
 };
 
 const updatePerson: RequestHandler<
   PersonParams,
-  PersonResponse,
+  ApiSuccess<PersonDto>,
   UpdatePersonInput
 > = async (req, res) => {
   const existing = await prisma.person.findFirst({
-    where: { id: req.params.id, treeId: req.tree.id },
+    where: { id: req.params.personId, treeId: req.tree.id },
   });
   if (!existing) throw new AppError("Person not found", 404);
 
@@ -101,16 +72,16 @@ const updatePerson: RequestHandler<
     data,
     select: personSelect,
   });
-  res.json({ status: "success", data: person });
+  res.json({ data: toPersonDto(person) });
 };
 
 const deletePerson: RequestHandler<PersonParams> = async (req, res) => {
   const existing = await prisma.person.findFirst({
-    where: { id: req.params.id, treeId: req.tree.id },
+    where: { id: req.params.personId, treeId: req.tree.id },
   });
   if (!existing) throw new AppError("Person not found", 404);
   await prisma.person.delete({ where: { id: existing.id } });
   res.status(204).send();
 };
 
-export { createPerson, getPersons, getPersonById, updatePerson, deletePerson };
+export { createPerson, updatePerson, deletePerson };

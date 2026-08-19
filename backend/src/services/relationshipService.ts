@@ -2,6 +2,8 @@ import AppError from "../utils/AppError.js";
 import { prisma } from "../config/db.js";
 import { RelationshipType } from "../generated/prisma/index.js";
 import { normalizeRelationship } from "./normalizeRelationship.js";
+import type { CreateRelationshipInput } from "../validators/relationshipValidators.js";
+import { relationshipSelect } from "../dtos/relationshipDto.js";
 
 /**
  * Validates that a proposed relationship between two persons is valid within the context of a tree.
@@ -105,6 +107,27 @@ type RelationshipWrite = {
   type: RelationshipType;
 };
 
+export const translateRelationshipRequest = (
+  input: CreateRelationshipInput,
+): Omit<RelationshipWrite, "treeId"> => {
+  if (input.relation === "CHILD") {
+    return {
+      personAId: input.personBId,
+      personBId: input.personAId,
+      type: RelationshipType.PARENT_CHILD,
+    };
+  }
+
+  return {
+    personAId: input.personAId,
+    personBId: input.personBId,
+    type:
+      input.relation === "PARENT"
+        ? RelationshipType.PARENT_CHILD
+        : RelationshipType.SPOUSE,
+  };
+};
+
 export async function createRelationshipRecord(input: RelationshipWrite) {
   const normalized = normalizeRelationship(
     input.personAId,
@@ -126,6 +149,7 @@ export async function createRelationshipRecord(input: RelationshipWrite) {
         ...normalized,
         type: input.type,
       },
+      select: relationshipSelect,
     });
   } catch (error) {
     if (

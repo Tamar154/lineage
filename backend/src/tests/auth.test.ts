@@ -81,7 +81,9 @@ describe("Auth", () => {
     const res = await user.agent.post("/api/trees").send({ name: "My Tree" });
 
     expect(res.status).toBe(201);
-    expect(res.body.data.ownerId).toBe(user.id);
+    expect(res.body.data.ownerId).toBeUndefined();
+    const tree = await prisma.tree.findUnique({ where: { id: res.body.data.id } });
+    expect(tree?.ownerId).toBe(user.id);
   });
 
   it("prevents one user from accessing another user's tree", async () => {

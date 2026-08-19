@@ -6,27 +6,28 @@ import type {
   CreateTreeInput,
   UpdateTreeInput,
 } from "../validators/treeValidators.js";
-import type { TreeResponse } from "../types/tree.js";
+import type { ApiSuccess } from "../dtos/apiSuccess.js";
+import { toTreeDto, treeSelect, type TreeDto } from "../dtos/treeDto.js";
 import { normalizeTreeName } from "../utils/normalization.js";
 
 const isUniqueConstraintError = (error: unknown) =>
   typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
 
-const getTrees: RequestHandler = async (req, res) => {
+const getTrees: RequestHandler<Record<string, never>, ApiSuccess<TreeDto[]>> = async (req, res) => {
   // Find all trees that belong to the authenticated user
   const trees = await prisma.tree.findMany({
     where: { ownerId: req.user.id },
+    select: treeSelect,
   });
 
   res.json({
-    status: "success",
-    data: trees,
+    data: trees.map(toTreeDto),
   });
 };
 
 const createTree: RequestHandler<
   Record<string, never>,
-  TreeResponse,
+  ApiSuccess<TreeDto>,
   CreateTreeInput
 > = async (req, res) => {
   const { name, description } = req.body;
@@ -53,6 +54,7 @@ const createTree: RequestHandler<
         description: description ?? null,
         ownerId: req.user.id,
       },
+      select: treeSelect,
     });
   } catch (error) {
     if (isUniqueConstraintError(error)) {
@@ -62,14 +64,13 @@ const createTree: RequestHandler<
   }
 
   res.status(201).json({
-    status: "success",
-    data: tree,
+    data: toTreeDto(tree),
   });
 };
 
 const updateTree: RequestHandler<
   { treeId: string },
-  TreeResponse,
+  ApiSuccess<TreeDto>,
   UpdateTreeInput
 > = async (req, res) => {
   const nameFields = req.body.name
@@ -85,8 +86,9 @@ const updateTree: RequestHandler<
           description: req.body.description,
         }),
       },
+      select: treeSelect,
     });
-    res.json({ status: "success", data: tree });
+    res.json({ data: toTreeDto(tree) });
   } catch (error) {
     if (isUniqueConstraintError(error)) {
       throw new AppError("name already exists", 400);
@@ -99,8 +101,7 @@ const getTree: RequestHandler = (req, res) => {
   const tree = req.tree; // This is set by the validateOwner middleware
 
   res.json({
-    status: "success",
-    data: tree,
+    data: toTreeDto(tree),
   });
 };
 

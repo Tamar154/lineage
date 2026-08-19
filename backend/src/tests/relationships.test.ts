@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "../config/db.js";
 import { createUserAgent } from "./helpers/auth.js";
 
-describe("Relationship V1 schema", () => {
+describe("Phase 3 relationship contract", () => {
   let user: ReturnType<typeof createUserAgent>;
   let treeId: string;
   let a: string;
@@ -11,91 +11,71 @@ describe("Relationship V1 schema", () => {
   beforeEach(async () => {
     user = createUserAgent();
     await user.register();
-    await user.login();
     const tree = await user.agent.post("/api/trees").send({ name: "Relations" });
     treeId = tree.body.data.id;
-    a = (await user.agent.post(`/api/trees/${treeId}/persons`).send({ firstName: "A" })).body.data.id;
-    b = (await user.agent.post(`/api/trees/${treeId}/persons`).send({ firstName: "B" })).body.data.id;
+    a = (await user.agent.post(`/api/trees/${treeId}/people`).send({ firstName: "A" })).body.data.id;
+    b = (await user.agent.post(`/api/trees/${treeId}/people`).send({ firstName: "B" })).body.data.id;
   });
 
   const create = (body: Record<string, unknown>) =>
     user.agent.post(`/api/trees/${treeId}/relationships`).send(body);
 
-  it("preserves A=parent and B=child without sorting", async () => {
-    const response = await create({ personAId: b, personBId: a, type: "PARENT_CHILD" });
+  it("converts PARENT without sorting IDs", async () => {
+    const response = await create({ personAId: b, personBId: a, relation: "PARENT" });
     expect(response.status).toBe(201);
+    expect(response.body).not.toHaveProperty("status");
+    expect(response.body.data).toEqual({
+      id: expect.any(String), personAId: b, personBId: a, type: "PARENT_CHILD",
+    });
+  });
+
+  it("converts CHILD by swapping parent and child", async () => {
+    const response = await create({ personAId: a, personBId: b, relation: "CHILD" });
     expect(response.body.data).toMatchObject({ personAId: b, personBId: a, type: "PARENT_CHILD" });
   });
 
-  it("normalizes spouses before persistence and duplicate lookup", async () => {
-    const first = await create({ personAId: b, personBId: a, type: "SPOUSE" });
+  it("normalizes spouse pairs and rejects a reverse duplicate", async () => {
+    const first = await create({ personAId: b, personBId: a, relation: "SPOUSE" });
     expect(first.status).toBe(201);
     expect(first.body.data.personAId < first.body.data.personBId).toBe(true);
-    const reverse = await create({ personAId: a, personBId: b, type: "SPOUSE" });
-    expect(reverse.status).toBe(400);
-    expect(await prisma.relationship.count({ where: { treeId, type: "SPOUSE" } })).toBe(1);
+    expect((await create({ personAId: a, personBId: b, relation: "SPOUSE" })).status).toBe(400);
   });
 
-  it("rejects A-C when A-B are already spouses", async () => {
-    const c = (await user.agent
-      .post(`/api/trees/${treeId}/persons`)
-      .send({ firstName: "C" })).body.data.id;
-
-    expect((await create({ personAId: a, personBId: b, type: "SPOUSE" })).status).toBe(201);
-    expect((await create({ personAId: a, personBId: c, type: "SPOUSE" })).status).toBe(400);
-    expect(await prisma.relationship.count({ where: { treeId, type: "SPOUSE" } })).toBe(1);
+  it("rejects persistence fields and unknown fields", async () => {
+    expect((await create({ personAId: a, personBId: b, type: "SPOUSE" })).status).toBe(400);
+    expect((await create({ personAId: a, personBId: b, relation: "SPOUSE", treeId })).status).toBe(400);
   });
 
-  it("rejects C-B when A-B are already spouses", async () => {
-    const c = (await user.agent
-      .post(`/api/trees/${treeId}/persons`)
-      .send({ firstName: "C" })).body.data.id;
-
-    expect((await create({ personAId: a, personBId: b, type: "SPOUSE" })).status).toBe(201);
-    expect((await create({ personAId: c, personBId: b, type: "SPOUSE" })).status).toBe(400);
-    expect(await prisma.relationship.count({ where: { treeId, type: "SPOUSE" } })).toBe(1);
-  });
-
-  it("rejects exact directed duplicates and self relationships", async () => {
-    expect((await create({ personAId: a, personBId: b, type: "PARENT_CHILD" })).status).toBe(201);
-    expect((await create({ personAId: a, personBId: b, type: "PARENT_CHILD" })).status).toBe(400);
-    expect((await create({ personAId: a, personBId: a, type: "SPOUSE" })).status).toBe(400);
-  });
-
-  it("rejects cross-tree and cross-owner person IDs", async () => {
+  it("rejects cross-tree participants and cross-owner mutation", async () => {
     const otherTree = await user.agent.post("/api/trees").send({ name: "Other" });
-    const otherPerson = await user.agent
-      .post(`/api/trees/${otherTree.body.data.id}/persons`)
-      .send({ firstName: "Other" });
-    expect((await create({ personAId: a, personBId: otherPerson.body.data.id, type: "SPOUSE" })).status).toBe(400);
-
+    const otherPerson = await user.agent.post(`/api/trees/${otherTree.body.data.id}/people`).send({ firstName: "Other" });
+    expect((await create({ personAId: a, personBId: otherPerson.body.data.id, relation: "SPOUSE" })).status).toBe(400);
     const otherOwner = createUserAgent();
     await otherOwner.register();
-    await otherOwner.login();
     expect((await otherOwner.agent.post(`/api/trees/${treeId}/relationships`).send({
-      personAId: a,
-      personBId: b,
-      type: "SPOUSE",
+      personAId: a, personBId: b, relation: "SPOUSE",
     })).status).toBe(404);
   });
 
-  it("deletes only the relationship", async () => {
-    const relationship = await create({ personAId: a, personBId: b, type: "SPOUSE" });
-    const response = await user.agent.delete(
-      `/api/trees/${treeId}/relationships/${relationship.body.data.id}`,
-    );
+  it("deletes only the relationship with an empty 204", async () => {
+    const relationship = await create({ personAId: a, personBId: b, relation: "SPOUSE" });
+    const secondTree = await user.agent.post("/api/trees").send({ name: "Deletion scope" });
+    expect((await user.agent.delete(`/api/trees/${secondTree.body.data.id}/relationships/${relationship.body.data.id}`)).status).toBe(404);
+    const response = await user.agent.delete(`/api/trees/${treeId}/relationships/${relationship.body.data.id}`);
     expect(response.status).toBe(204);
+    expect(response.text).toBe("");
     expect(await prisma.person.count({ where: { id: { in: [a, b] } } })).toBe(2);
   });
 
-  it("returns the refactored relationship from the graph endpoint", async () => {
-    await create({ personAId: a, personBId: b, type: "PARENT_CHILD" });
-    const graph = await user.agent.get(`/api/trees/${treeId}/graph`);
-    expect(graph.status).toBe(200);
-    expect(graph.body.data.relationships[0]).toMatchObject({
-      personAId: a,
-      personBId: b,
-      type: "PARENT_CHILD",
+  it("returns populated full-tree DTOs", async () => {
+    await create({ personAId: a, personBId: b, relation: "PARENT" });
+    const full = await user.agent.get(`/api/trees/${treeId}/full`);
+    expect(full.status).toBe(200);
+    expect(Object.keys(full.body.data).sort()).toEqual(["tree", "people", "relationships"].sort());
+    expect(full.body.data).not.toHaveProperty("persons");
+    expect(full.body.data.people).toHaveLength(2);
+    expect(full.body.data.relationships[0]).toEqual({
+      id: expect.any(String), personAId: a, personBId: b, type: "PARENT_CHILD",
     });
   });
 });

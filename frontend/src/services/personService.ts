@@ -23,10 +23,6 @@ type PersonFormData = {
   biography: string | null;
 };
 
-type TreeIdParams = {
-  treeId: string;
-};
-
 type PersonParams = {
   treeId: string;
   personId: string;
@@ -44,17 +40,7 @@ type UpdatePersonParams = {
 };
 
 export const createPerson = async ({ treeId, data }: CreatePersonParams) => {
-  const response = await api.post(`/trees/${treeId}/persons`, data);
-  return response.data;
-};
-
-export const getAllPersons = async ({ treeId }: TreeIdParams) => {
-  const response = await api.get(`/trees/${treeId}/persons`);
-  return response.data;
-};
-
-export const getPerson = async ({ treeId, personId }: PersonParams) => {
-  const response = await api.get(`/trees/${treeId}/persons/${personId}`);
+  const response = await api.post(`/trees/${treeId}/people`, data);
   return response.data;
 };
 
@@ -63,11 +49,11 @@ export const updatePerson = async ({
   personId,
   data,
 }: UpdatePersonParams) => {
-  const response = await api.put(`/trees/${treeId}/persons/${personId}`, data);
+  const response = await api.patch(`/trees/${treeId}/people/${personId}`, data);
   return response.data;
 };
 
 export const deletePerson = async ({ treeId, personId }: PersonParams) => {
-  const response = await api.delete(`/trees/${treeId}/persons/${personId}`);
+  const response = await api.delete(`/trees/${treeId}/people/${personId}`);
   return response.data;
 };

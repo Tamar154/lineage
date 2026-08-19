@@ -1,15 +1,13 @@
 import { z } from "zod";
-import { RelationshipType } from "../generated/prisma/index.js";
-
 export const createRelSchema = z.object({
   personAId: z.uuid(),
   personBId: z.uuid(),
-  type: z.enum(RelationshipType),
-});
+  relation: z.enum(["PARENT", "CHILD", "SPOUSE"]),
+}).strict();
 
 export const relParamsSchema = z.object({
-  id: z.uuid(),
+  relationshipId: z.uuid(),
 });
 
-export type RelationshipInput = z.infer<typeof createRelSchema>;
+export type CreateRelationshipInput = z.infer<typeof createRelSchema>;
 export type RelationshipParams = z.infer<typeof relParamsSchema>;

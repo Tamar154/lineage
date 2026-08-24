@@ -42,7 +42,7 @@ const createTree: RequestHandler<
   });
 
   if (sameName) {
-    throw new AppError("name already exists", 400);
+    throw new AppError("TREE_NAME_ALREADY_EXISTS");
   }
 
   // Create the tree
@@ -58,7 +58,7 @@ const createTree: RequestHandler<
     });
   } catch (error) {
     if (isUniqueConstraintError(error)) {
-      throw new AppError("name already exists", 400);
+      throw new AppError("TREE_NAME_ALREADY_EXISTS");
     }
     throw error;
   }
@@ -91,7 +91,7 @@ const updateTree: RequestHandler<
     res.json({ data: toTreeDto(tree) });
   } catch (error) {
     if (isUniqueConstraintError(error)) {
-      throw new AppError("name already exists", 400);
+      throw new AppError("TREE_NAME_ALREADY_EXISTS");
     }
     throw error;
   }

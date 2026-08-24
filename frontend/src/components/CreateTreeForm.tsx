@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createTree } from "../services/treeService";
 import styles from "../styles/CreateTreeForm.module.css";
+import { getLineAgeErrorMessage } from "../api/apiError";
 
 type Props = {
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
@@ -29,8 +30,8 @@ const CreateTreeForm = ({ setShow, refreshTrees }: Props) => {
       await createTree({ name: trimmedName });
       await refreshTrees();
       setShow(false);
-    } catch (error: any) {
-      setError(error.response?.data?.message || "Something went wrong");
+    } catch (error: unknown) {
+      setError(getLineAgeErrorMessage(error, "Something went wrong"));
     } finally {
       setIsSubmitting(false);
     }

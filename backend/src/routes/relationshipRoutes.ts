@@ -10,10 +10,12 @@ import {
   createRelSchema,
   relParamsSchema,
 } from "../validators/relationshipValidators.js";
+import { treeParamsSchema } from "../validators/treeValidators.js";
 
 const router = express.Router({ mergeParams: true });
 
 router.use(requireAuth);
+router.use(parseParams(treeParamsSchema));
 router.use(validateOwner); // All routes require ownership validation
 
 router.post("/", validateBody(createRelSchema), createRelationship);

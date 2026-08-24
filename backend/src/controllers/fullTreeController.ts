@@ -23,7 +23,7 @@ export const getFullTree: RequestHandler<
     },
   });
 
-  if (!tree) throw new AppError("Tree not found", 404);
+  if (!tree) throw new AppError("NOT_FOUND");
 
   const { persons, relationships, ...treeFields } = tree;
   res.json({

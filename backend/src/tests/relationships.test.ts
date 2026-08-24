@@ -38,7 +38,9 @@ describe("Phase 3 relationship contract", () => {
     const first = await create({ personAId: b, personBId: a, relation: "SPOUSE" });
     expect(first.status).toBe(201);
     expect(first.body.data.personAId < first.body.data.personBId).toBe(true);
-    expect((await create({ personAId: a, personBId: b, relation: "SPOUSE" })).status).toBe(400);
+    const duplicate = await create({ personAId: a, personBId: b, relation: "SPOUSE" });
+    expect(duplicate.status).toBe(409);
+    expect(duplicate.body.error.code).toBe("RELATIONSHIP_ALREADY_EXISTS");
   });
 
   it("rejects persistence fields and unknown fields", async () => {
@@ -49,7 +51,9 @@ describe("Phase 3 relationship contract", () => {
   it("rejects cross-tree participants and cross-owner mutation", async () => {
     const otherTree = await user.agent.post("/api/trees").send({ name: "Other" });
     const otherPerson = await user.agent.post(`/api/trees/${otherTree.body.data.id}/people`).send({ firstName: "Other" });
-    expect((await create({ personAId: a, personBId: otherPerson.body.data.id, relation: "SPOUSE" })).status).toBe(400);
+    const outsideTree = await create({ personAId: a, personBId: otherPerson.body.data.id, relation: "SPOUSE" });
+    expect(outsideTree.status).toBe(404);
+    expect(outsideTree.body.error.code).toBe("PERSON_NOT_IN_TREE");
     const otherOwner = createUserAgent();
     await otherOwner.register();
     expect((await otherOwner.agent.post(`/api/trees/${treeId}/relationships`).send({

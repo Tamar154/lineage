@@ -43,7 +43,7 @@ const deleteRelationship: RequestHandler<RelationshipParams> = async (
   });
 
   if (!existing) {
-    throw new AppError("Relationship not found", 404);
+    throw new AppError("NOT_FOUND", { message: "Relationship not found." });
   }
 
   await prisma.relationship.delete({

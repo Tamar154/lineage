@@ -43,7 +43,9 @@ const updatePerson: RequestHandler<
   const existing = await prisma.person.findFirst({
     where: { id: req.params.personId, treeId: req.tree.id },
   });
-  if (!existing) throw new AppError("Person not found", 404);
+  if (!existing) {
+    throw new AppError("NOT_FOUND", { message: "Person not found." });
+  }
 
   const mergedDates = {
     birthDate:
@@ -61,7 +63,11 @@ const updatePerson: RequestHandler<
   };
 
   const dateErrors = validatePersonDates(mergedDates);
-  if (dateErrors.length) throw new AppError(dateErrors.join("; "), 400);
+  if (dateErrors.length) {
+    throw new AppError("VALIDATION_ERROR", {
+      details: { formErrors: dateErrors },
+    });
+  }
 
   const data = Object.fromEntries(
     Object.entries(req.body).filter(([, value]) => value !== undefined),
@@ -79,7 +85,9 @@ const deletePerson: RequestHandler<PersonParams> = async (req, res) => {
   const existing = await prisma.person.findFirst({
     where: { id: req.params.personId, treeId: req.tree.id },
   });
-  if (!existing) throw new AppError("Person not found", 404);
+  if (!existing) {
+    throw new AppError("NOT_FOUND", { message: "Person not found." });
+  }
   await prisma.person.delete({ where: { id: existing.id } });
   res.status(204).send();
 };

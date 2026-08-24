@@ -39,7 +39,7 @@ app.use("/api/trees/:treeId/full", fullTreeRoutes);
 
 // 404 handler
 app.use((req, res, next) => {
-  next(new AppError("Route not found", 404));
+  next(new AppError("NOT_FOUND", { message: "Route not found." }));
 });
 
 // Centralized error handler

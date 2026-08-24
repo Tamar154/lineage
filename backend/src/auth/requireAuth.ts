@@ -13,7 +13,7 @@ export const requireAuth = async (
   });
 
   if (!session?.user?.id) {
-    throw new AppError("Unauthorized", 401);
+    throw new AppError("UNAUTHENTICATED");
   }
 
   req.user = {

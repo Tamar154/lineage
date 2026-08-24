@@ -8,6 +8,8 @@ import TreesLayout from "../components/TreesLayout";
 import styles from "../styles/TreesPage.module.css";
 import { FaPlus } from "react-icons/fa6";
 import TreeCard from "../components/TreeCard";
+import axios from "axios";
+import { getLineAgeErrorMessage } from "../api/apiError";
 
 const TreesPage = () => {
   const [trees, setTrees] = useState<Tree[]>([]);
@@ -19,12 +21,12 @@ const TreesPage = () => {
     try {
       const res = await getTrees();
       setTrees(res.data);
-    } catch (error: any) {
-      if (error.response?.status === 401) {
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
         navigate("/login");
         return;
       }
-      setError(error.response.data.message || "Something went wrong");
+      setError(getLineAgeErrorMessage(error, "Something went wrong"));
     }
   };
 
@@ -32,8 +34,8 @@ const TreesPage = () => {
     try {
       await deleteTree({ treeId });
       setTrees((prevTrees) => prevTrees.filter((tree) => tree.id !== treeId));
-    } catch (error: any) {
-      setError(error.response?.data?.message || "Failed to delete tree");
+    } catch (error: unknown) {
+      setError(getLineAgeErrorMessage(error, "Failed to delete tree"));
     }
   };
 

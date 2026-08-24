@@ -20,15 +20,12 @@ export const validateOwner: RequestHandler<TreeParams> = async (
   const tree = await prisma.tree.findFirst({
     where: {
       id: treeId,
-      ownerId: req.user!.id,
+      ownerId: req.user.id,
     },
   });
 
   if (!tree) {
-    throw new AppError(
-      "Tree not found or you do not have permission to access it",
-      404,
-    );
+    throw new AppError("NOT_FOUND");
   }
 
   // Attach the tree to the request object for later use

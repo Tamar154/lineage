@@ -30,10 +30,11 @@ export async function validateRelationship(
 ): Promise<void> {
   // Check for self-relationship
   if (personAId === personBId) {
-    throw new AppError(
-      "A person cannot have a relationship with themselves",
-      400,
-    );
+    throw new AppError("VALIDATION_ERROR", {
+      details: {
+        formErrors: ["A person cannot have a relationship with themselves."],
+      },
+    });
   }
 
   // Validate that both persons belong to the same tree
@@ -45,7 +46,7 @@ export async function validateRelationship(
   });
 
   if (persons.length !== 2) {
-    throw new AppError("Both persons must belong to the same tree", 400);
+    throw new AppError("PERSON_NOT_IN_TREE");
   }
 
   const existing = await prisma.relationship.findFirst({
@@ -59,7 +60,7 @@ export async function validateRelationship(
   });
 
   if (existing) {
-    throw new AppError("This relationship already exists", 400);
+    throw new AppError("RELATIONSHIP_ALREADY_EXISTS");
   }
 
   if (type === RelationshipType.SPOUSE) {
@@ -76,7 +77,7 @@ export async function validateRelationship(
     });
 
     if (existingSpouse) {
-      throw new AppError("A person cannot have more than one spouse", 400);
+      throw new AppError("MAX_SPOUSE_LIMIT_REACHED");
     }
   }
 
@@ -92,10 +93,7 @@ export async function validateRelationship(
     });
 
     if (circular) {
-      throw new AppError(
-        "Circular parent-child relationships are not allowed",
-        400,
-      );
+      throw new AppError("RELATIONSHIP_CYCLE_DETECTED");
     }
   }
 }
@@ -158,7 +156,7 @@ export async function createRelationshipRecord(input: RelationshipWrite) {
       "code" in error &&
       error.code === "P2002"
     ) {
-      throw new AppError("This relationship already exists", 400);
+      throw new AppError("RELATIONSHIP_ALREADY_EXISTS");
     }
     throw error;
   }

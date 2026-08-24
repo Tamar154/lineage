@@ -378,6 +378,52 @@ Current relationship validation includes:
 - Direct circular parent-child relationships are not allowed
 - A person can have at most one spouse
 
+## Error Responses
+
+LineAge-owned API routes return errors in one envelope:
+
+```json
+{
+  "error": {
+    "code": "TREE_NAME_ALREADY_EXISTS",
+    "message": "You already have a tree with this name."
+  }
+}
+```
+
+The optional `details` property is omitted when it is not needed. Validation errors can include field and form-level messages:
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Some fields are invalid.",
+    "details": {
+      "fields": {
+        "name": "Tree name is required"
+      },
+      "formErrors": ["At least one field is required"]
+    }
+  }
+}
+```
+
+Current representative mappings are:
+
+| HTTP status | Error code                    | Use                                             |
+| ----------: | ----------------------------- | ----------------------------------------------- |
+|       `400` | `VALIDATION_ERROR`            | Invalid input or malformed JSON                 |
+|       `401` | `UNAUTHENTICATED`             | Missing LineAge session                         |
+|       `404` | `NOT_FOUND`                   | Missing or concealed private resource           |
+|       `404` | `PERSON_NOT_IN_TREE`          | Relationship participant outside the route tree |
+|       `409` | `TREE_NAME_ALREADY_EXISTS`    | Normalized tree-name conflict                   |
+|       `409` | `RELATIONSHIP_ALREADY_EXISTS` | Duplicate relationship                          |
+|       `409` | `MAX_SPOUSE_LIMIT_REACHED`    | Existing spouse-limit rejection                 |
+|       `409` | `RELATIONSHIP_CYCLE_DETECTED` | Existing direct-cycle rejection                 |
+|       `500` | `INTERNAL_ERROR`              | Sanitized unexpected failure                    |
+
+Better Auth owns the response contract for `/api/auth/*`. Its signup, signin, OAuth, signout, and session errors are not wrapped in the LineAge envelope.
+
 ## Testing
 
 Backend tests are located in:

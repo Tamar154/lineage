@@ -55,7 +55,7 @@ describe("Tree", () => {
 
     it("rejects case and whitespace variants for the same owner", async () => {
       expect((await user.agent.post("/api/trees").send({ name: "Cohen Family" })).status).toBe(201);
-      expect((await user.agent.post("/api/trees").send({ name: " cohen   family " })).status).toBe(400);
+      expect((await user.agent.post("/api/trees").send({ name: " cohen   family " })).status).toBe(409);
     });
 
     it("allows different owners to use the same normalized name", async () => {
@@ -87,8 +87,11 @@ describe("Tree", () => {
       await user.agent.post("/api/trees").send({ name: "My Tree" });
       const res = await user.agent.post("/api/trees").send({ name: "My Tree" });
 
-      expect(res.status).toBe(400);
-      expect(res.body.message).toMatch(/already exists/i);
+      expect(res.status).toBe(409);
+      expect(res.body.error).toEqual({
+        code: "TREE_NAME_ALREADY_EXISTS",
+        message: "You already have a tree with this name.",
+      });
     });
 
     it("Should not allow unauthenticated users to create a tree", async () => {
@@ -97,21 +100,21 @@ describe("Tree", () => {
         .send({ name: "My Tree" });
 
       expect(res.status).toBe(401);
-      expect(res.body.message).toMatch(/not authorized|unauthorized/i);
+      expect(res.body.error.code).toBe("UNAUTHENTICATED");
     });
 
     it("should not allow creating a tree with an empty name", async () => {
       const res = await user.agent.post("/api/trees").send({ name: "" });
 
       expect(res.status).toBe(400);
-      expect(res.body.message).toMatch(/tree name is required|invalid/i);
+      expect(res.body.error.details.fields.name).toMatch(/tree name is required/i);
     });
 
     it("should reject creating a tree with whitespace name", async () => {
       const res = await user.agent.post("/api/trees").send({ name: "   " });
 
       expect(res.status).toBe(400);
-      expect(res.body.message).toMatch(/tree name is required|invalid/i);
+      expect(res.body.error.details.fields.name).toMatch(/tree name is required/i);
     });
   });
 
@@ -143,7 +146,7 @@ describe("Tree", () => {
     it("should not allow unauthenticated users to get trees", async () => {
       const res = await request(app).get("/api/trees");
       expect(res.status).toBe(401);
-      expect(res.body.message).toMatch(/not authorized|unauthorized/i);
+      expect(res.body.error.code).toBe("UNAUTHENTICATED");
     });
 
     it("should not allow a user to get another user's trees", async () => {
@@ -196,7 +199,7 @@ describe("Tree", () => {
       const res = await request(app).get(`/api/trees/${treeId}`);
 
       expect(res.status).toBe(401);
-      expect(res.body.message).toMatch(/not authorized|unauthorized/i);
+      expect(res.body.error.code).toBe("UNAUTHENTICATED");
     });
 
     it("should not allow a user to get another user's tree by ID", async () => {
@@ -212,7 +215,7 @@ describe("Tree", () => {
       const res = await user.agent.get(`/api/trees/${treeId}`);
 
       expect(res.status).toBe(404);
-      expect(res.body.message).toMatch(/not found|permission/i);
+      expect(res.body.error.code).toBe("NOT_FOUND");
     });
 
     it("should return 404 for a non-existent tree ID", async () => {
@@ -221,14 +224,14 @@ describe("Tree", () => {
       const res = await user.agent.get(`/api/trees/${missingTreeId}`);
 
       expect(res.status).toBe(404);
-      expect(res.body.message).toMatch(/not found|permission/i);
+      expect(res.body.error.code).toBe("NOT_FOUND");
     });
 
     it("should return 400 for an invalid tree ID format", async () => {
       const res = await user.agent.get("/api/trees/not-a-uuid");
 
       expect(res.status).toBe(400);
-      expect(res.body.message).toMatch(/invalid|uuid/i);
+      expect(res.body.error.details.fields.treeId).toMatch(/uuid/i);
     });
   });
 
@@ -257,7 +260,7 @@ describe("Tree", () => {
       const res = await request(app).delete(`/api/trees/${treeId}`);
 
       expect(res.status).toBe(401);
-      expect(res.body.message).toMatch(/not authorized|unauthorized/i);
+      expect(res.body.error.code).toBe("UNAUTHENTICATED");
     });
 
     it("should not allow a user to delete another user's tree", async () => {
@@ -273,7 +276,7 @@ describe("Tree", () => {
       const res = await user.agent.delete(`/api/trees/${treeId}`);
 
       expect(res.status).toBe(404);
-      expect(res.body.message).toMatch(/not found|permission/i);
+      expect(res.body.error.code).toBe("NOT_FOUND");
 
       const tree = await prisma.tree.findUnique({ where: { id: treeId } });
       expect(tree).not.toBeNull();
@@ -283,7 +286,7 @@ describe("Tree", () => {
       const res = await user.agent.delete("/api/trees/not-a-uuid");
 
       expect(res.status).toBe(400);
-      expect(res.body.message).toMatch(/invalid|uuid/i);
+      expect(res.body.error.details.fields.treeId).toMatch(/uuid/i);
     });
 
     it("should return 404 when deleting a non-existent tree", async () => {
@@ -292,7 +295,7 @@ describe("Tree", () => {
       const res = await user.agent.delete(`/api/trees/${missingTreeId}`);
 
       expect(res.status).toBe(404);
-      expect(res.body.message).toMatch(/not found|permission/i);
+      expect(res.body.error.code).toBe("NOT_FOUND");
     });
   });
 });
